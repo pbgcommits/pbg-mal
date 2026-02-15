@@ -12,10 +12,16 @@ public class step1_read_print {
                 String input = s.nextLine();
                 String output = repl.repl(input);
                 System.out.println(output);
-            } catch (java.util.NoSuchElementException e) {
+            } 
+            catch (java.util.NoSuchElementException e) {
                 break;
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+            }
+            catch (IndexOutOfBoundsException e) {
+                System.out.println("unbalanced parens");
+            } 
+            catch (Exception e) {
+                // System.out.println(e.getMessage());
+                // break;
             }
         }
         s.close();

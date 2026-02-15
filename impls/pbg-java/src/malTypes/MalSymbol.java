@@ -1,11 +1,12 @@
 package malTypes;
 
 public class MalSymbol extends MalType {
-    private String symbol;
+    private final String symbol;
     public MalSymbol(String s) {
         this.symbol = s;
     }
-    public String getSymbol() {
-        return symbol;
+    @Override
+    public String toString() {
+        return this.symbol;
     }
 }

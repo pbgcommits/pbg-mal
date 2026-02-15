@@ -1,11 +1,12 @@
 package malTypes;
 
 public class MalInteger extends MalType {
-    private int number;
+    private final int number;
     public MalInteger(int num) {
         this.number = num;
     }
-    public int getNumber() {
-        return number;
+    @Override
+    public String toString() {
+        return String.valueOf(this.number);
     }
 }

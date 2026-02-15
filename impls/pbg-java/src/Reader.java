@@ -52,18 +52,20 @@ public class Reader {
     }
 
     private MalType readForm() {
-        switch (this.peek()) {
-            case "(":
-                return this.readList();
+        String next = this.peek();
+        switch (next) {
+            case MalList.LIST_START:
+            case MalList.VECTOR_START:
+                return this.readList(next);
             default:
                 return this.readAtom();
         }
     }
 
-    private MalType readList() {
-        MalList m = new MalList();
+    private MalType readList(String type) {
+        MalList m = new MalList(type);
         this.next();
-        while (!this.peek().equals(")")) {
+        while (!this.peek().equals(m.getEnd())) {
             m.add(this.readForm());
         }
         this.next();

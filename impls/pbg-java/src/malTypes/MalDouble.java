@@ -1,11 +1,12 @@
 package malTypes;
 
 public class MalDouble extends MalType {
-    private double num;
+    private final double num;
     public MalDouble(double num) {
         this.num = num;
     }
-    public double getNumber() {
-        return num;
+    @Override
+    public String toString() {
+        return String.valueOf(this.num);
     }
 }
