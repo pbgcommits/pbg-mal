@@ -12,6 +12,13 @@ import malTypes.MalSymbol;
 import malTypes.MalType;
 
 public class Reader {
+
+    private static Pattern tokenPattern = Pattern.compile(
+        "[\\s,]*(~@|[\\[\\]{}()'`~^@]|\"(?:\\\\.|[^\\\\\"])*\"?|;.*|[^\\s\\[\\]{}('\"`,;)]*)"
+    );
+    private static Pattern intPattern = Pattern.compile("-?\\d+");
+    private static Pattern doublePattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+
     private Reader(List<String> tokens) {
         this.tokens = tokens;
         this.position = 0;
@@ -31,16 +38,13 @@ public class Reader {
         return m;
     }
     public static List<String> tokenise(String s) {
-        Pattern pattern = Pattern.compile(
-            "[\\s,]*(~@|[\\[\\]{}()'`~^@]|\"(?:\\\\.|[^\\\\\"])*\"?|;.*|[^\\s\\[\\]{}('\"`,;)]*)"
-        );
-        Matcher matcher = pattern.matcher(s);
+        Matcher matcher = tokenPattern.matcher(s);
         List<MatchResult> list = matcher.results().collect(Collectors.toList());
         List<String> tokens = new ArrayList<>();
         // System.out.println("input: " + s);
         // System.out.println("Tokens:");
         for (MatchResult m : list) {
-            String token = m.group().strip();
+            String token = m.group(1);
             // System.out.println(token);
             tokens.add(token);
         }
@@ -62,11 +66,9 @@ public class Reader {
         while (!this.peek().equals(")")) {
             m.add(this.readForm());
         }
+        this.next();
         return m;
     }
-
-    Pattern intPattern = Pattern.compile("-?\\d+");
-    Pattern doublePattern = Pattern.compile("-?\\d+(\\.\\d+)?");
     
     private MalType readAtom() {
         String s = this.next();

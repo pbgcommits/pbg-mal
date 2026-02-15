@@ -2,10 +2,10 @@ import java.util.Scanner;
 
 import malTypes.MalType;
 
-public class step1_repl {
+public class step1_read_print {
     public static void main(String args[]) {
         Scanner s = new Scanner(System.in);
-        step1_repl repl = new step1_repl();
+        step1_read_print repl = new step1_read_print();
         while (true) {
             try {
                 System.out.print("user> ");
