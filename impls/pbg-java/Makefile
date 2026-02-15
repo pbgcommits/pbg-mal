@@ -1,2 +1,2 @@
-%: %.java
-	mkdir -p target/classes/mal && javac -d target/classes/mal $<
+%: src/%.java
+	mkdir -p target/classes/mal && cd src && javac -d ../target/classes/mal $@.java
