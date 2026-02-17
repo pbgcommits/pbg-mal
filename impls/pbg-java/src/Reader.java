@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import malTypes.MalList;
+import malTypes.MalString;
 import malTypes.MalDouble;
 import malTypes.MalInteger;
 import malTypes.MalSymbol;
@@ -31,7 +32,7 @@ public class Reader {
     private String peek() {
         return tokens.get(position);
     }
-    public static MalType readStr(String s) {
+    public static MalType readStr(String s) throws Exception {
         List<String> tokens = Reader.tokenise(s);
         Reader r = new Reader(tokens);
         MalType m = r.readForm();
@@ -51,7 +52,7 @@ public class Reader {
         return tokens;
     }
 
-    private MalType readForm() {
+    private MalType readForm() throws Exception {
         String next = this.peek();
         switch (next) {
             case MalList.LIST_START:
@@ -62,7 +63,7 @@ public class Reader {
         }
     }
 
-    private MalType readList(String type) {
+    private MalType readList(String type) throws Exception {
         MalList m = new MalList(type);
         this.next();
         while (!this.peek().equals(m.getEnd())) {
@@ -72,9 +73,19 @@ public class Reader {
         return m;
     }
     
-    private MalType readAtom() {
+    private MalType readAtom() throws Exception {
         String s = this.next();
         // System.out.println("symbol: " + s);
+        if (s.length() == 0) {
+            return new MalSymbol(s);
+        }
+        if (s.startsWith(MalString.STRING_START)) {
+            if (s.length() == 1 || !s.endsWith(MalString.STRING_END)) {
+                throw new Exception("Unbalanced quotation marks");
+            }
+            // System.out.println("string");
+            return new MalString(s);
+        }
         Matcher intMatcher = intPattern.matcher(s);
         if (intMatcher.matches()) {
             // System.out.println("int");

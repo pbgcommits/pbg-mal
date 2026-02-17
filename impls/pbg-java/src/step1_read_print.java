@@ -20,18 +20,18 @@ public class step1_read_print {
                 System.out.println("unbalanced parens");
             } 
             catch (Exception e) {
-                // System.out.println(e.getMessage());
+                System.out.println(e.getMessage());
                 // break;
             }
         }
         s.close();
     }
 
-    public String repl(String s) {
+    public String repl(String s) throws Exception {
         return print(eval(read(s)));
     }
 
-    public MalType read(String s) {
+    public MalType read(String s) throws Exception {
         return Reader.readStr(s);
     }
     public MalType eval(MalType ast) {
