@@ -6,11 +6,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import malTypes.MalList;
+import malTypes.MalNil;
 import malTypes.MalString;
+import malTypes.MalCollectionType;
 import malTypes.MalDouble;
+import malTypes.MalFalse;
+import malTypes.MalHashMap;
 import malTypes.MalInteger;
 import malTypes.MalSymbol;
+import malTypes.MalTrue;
 import malTypes.MalType;
+import malTypes.MalVector;
 
 public class Reader {
 
@@ -56,7 +62,8 @@ public class Reader {
         String next = this.peek();
         switch (next) {
             case MalList.LIST_START:
-            case MalList.VECTOR_START:
+            case MalVector.VECTOR_START:
+            case MalHashMap.HASHMAP_START:
                 return this.readList(next);
             default:
                 return this.readAtom();
@@ -64,7 +71,14 @@ public class Reader {
     }
 
     private MalType readList(String type) throws Exception {
-        MalList m = new MalList(type);
+        MalCollectionType m;
+        if (type.equals(MalVector.VECTOR_START)) {
+            m = new MalVector();
+        } else if (type.equals(MalHashMap.HASHMAP_START)) {
+            m = new MalHashMap();
+        } else {
+            m = new MalList();
+        }
         this.next();
         while (!this.peek().equals(m.getEnd())) {
             m.add(this.readForm());
@@ -81,10 +95,19 @@ public class Reader {
         }
         if (s.startsWith(MalString.STRING_START)) {
             if (s.length() == 1 || !s.endsWith(MalString.STRING_END)) {
-                throw new Exception("Unbalanced quotation marks");
+                throw new Exception("unbalanced quotation marks");
             }
             // System.out.println("string");
             return new MalString(s);
+        }
+        if (s.equals(MalNil.NIL)) {
+            return new MalNil();
+        }
+        if (s.equals(MalTrue.TRUE)) {
+            return new MalTrue();
+        }
+        if (s.equals(MalFalse.FALSE)) {
+            return new MalFalse();
         }
         Matcher intMatcher = intPattern.matcher(s);
         if (intMatcher.matches()) {

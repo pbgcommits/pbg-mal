@@ -1,6 +1,6 @@
 package malTypes;
 
-public class MalSymbol extends MalType {
+public class MalSymbol extends MalType implements MalHashMapKey {
     private final String symbol;
     public MalSymbol(String s) {
         this.symbol = s;
