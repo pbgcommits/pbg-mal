@@ -11,10 +11,10 @@ import malTypes.MalSymbol;
 import malTypes.MalType;
 import malTypes.MalVector;
 
-public class step2_eval {
+public class step3_env {
     public static void main(String args[]) {
         Scanner s = new Scanner(System.in);
-        step2_eval repl = new step2_eval();
+        step3_env repl = new step3_env();
         ReplEnv env = new ReplEnv();
         env.set(new MalSymbol("+"), new MalFunction() {
             @Override
