@@ -5,8 +5,18 @@ public class MalDouble extends MalType {
     public MalDouble(double num) {
         this.num = num;
     }
+    public double getNumber() {
+        return this.num;
+    }
     @Override
     public String toString() {
         return String.valueOf(this.num);
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!(this.getClass().equals(o.getClass()))) return false;
+        return this.getNumber() == ((MalDouble) o).getNumber();
     }
 }

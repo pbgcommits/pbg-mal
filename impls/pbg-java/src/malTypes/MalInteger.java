@@ -12,4 +12,11 @@ public class MalInteger extends MalType {
     public String toString() {
         return String.valueOf(this.number);
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!(this.getClass().equals(o.getClass()))) return false;
+        return this.getNumber() == ((MalInteger) o).getNumber();
+    }
 }

@@ -30,11 +30,19 @@ public class MalString extends MalType implements MalHashMapKey {
         }
         this.string = builder.toString();
     }
-    @Override
-    public String toString() {
+
+    public String toString(boolean printReadably) {
+        if (!printReadably) {
+            return this.string;
+        }
         String unescapeBackSlash = this.string.replace("\\", "\\\\");
         String unescapeQuote = unescapeBackSlash.replace("\"", "\\\"");
         String unescapeNewLine = unescapeQuote.replace("\n", "\\n");
         return "\"" + unescapeNewLine + "\"";
+    }
+
+    @Override
+    public String toString() {
+        return toString(true);
     }
 }

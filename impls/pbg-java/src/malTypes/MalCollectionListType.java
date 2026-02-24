@@ -27,4 +27,11 @@ public abstract class MalCollectionListType extends MalCollectionType {
         }
         return this.getStart() + String.join(" ", stringList) + this.getEnd();
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!(this.getClass().equals(o.getClass()))) return false;
+        return ((MalCollectionListType) o).getCollection().equals(this.getCollection());
+    }
 }
