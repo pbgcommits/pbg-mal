@@ -1,16 +1,13 @@
 package main.java.malTypes;
 
-public class MalDeref extends MalType {
+import java.util.List;
+
+public class MalDeref extends MalList {
     public final static String START = "@";
-    private String string;
-    public MalDeref(String s) {
-        this.string = s;
+    public MalDeref(MalType t) throws Exception {
+        super();
+        List<MalType> list = this.getCollection();
+        list.add(new MalSymbol("deref"));
+        list.add(t);
     }
-    public String getString() {
-        return string;
-    }
-    @Override
-    public String toString(boolean printReadably) {
-        return "(deref " + this.string + ")";
-    } 
 }

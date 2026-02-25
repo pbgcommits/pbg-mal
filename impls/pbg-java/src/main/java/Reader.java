@@ -88,7 +88,11 @@ public class Reader {
         }
         this.next();
         while (!this.peek().equals(m.getEnd())) {
-            m.add(this.readForm());
+            MalType t = this.readForm();
+            if (t != null) {
+                // Comments return null
+                m.add(t);
+            }
         }
         this.next();
         return m;
@@ -116,7 +120,7 @@ public class Reader {
             return new MalQuasiQuote(this.readForm().toString());
         }
         if (s.startsWith(MalDeref.START)) {
-            return new MalDeref(this.readForm().toString());
+            return new MalDeref(this.readForm());
         }
         if (s.startsWith(MalMetadata.START)) {
             MalType metadata = this.readForm();

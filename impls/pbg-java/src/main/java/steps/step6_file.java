@@ -32,8 +32,22 @@ public class step6_file {
         for (MalSymbol key : core.getNameSpace().keySet()) {
             env.set(key, core.getNameSpace().get(key));
         }
+        env.set(new MalSymbol("eval"), new MalFunction() {
+            step6_file x = new step6_file();
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                if (a.length < 1) {
+                    throw new Exception(LIST_ERROR);
+                }
+                return x.eval(a[0], env);
+            }
+        });
         try {
             repl.repl("(def! not (fn* (a) (if a false true)))", env);
+            repl.repl(
+                "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\\nnil)\")))))", 
+                env);
+            // repl.repl("def! load-file (fn* (f) (slurp f))", env);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("Aborting early");

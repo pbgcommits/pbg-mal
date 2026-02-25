@@ -1,0 +1,2 @@
+(def! hello "Hello world!")
+(def! goodbye "Goodbye world!");Fun times
