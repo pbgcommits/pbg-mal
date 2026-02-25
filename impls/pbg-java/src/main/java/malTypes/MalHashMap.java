@@ -38,7 +38,10 @@ public class MalHashMap extends MalCollectionType {
         StringBuilder b = new StringBuilder();
         b.append(this.getStart());
         for (MalHashMapKey key : this.hashMap.keySet()) {
-            b.append(key.toString(printReadably) + " " + this.hashMap.get(key).toString(printReadably));
+            b.append(key.toString(printReadably) + " " + this.hashMap.get(key).toString(printReadably) + " ");
+        }
+        if (b.length() > this.getStart().length()) {
+            b.deleteCharAt(b.length() - 1);
         }
         b.append(this.getEnd());
         return b.toString();

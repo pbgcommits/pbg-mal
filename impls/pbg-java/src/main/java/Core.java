@@ -167,7 +167,10 @@ public class Core {
                     return new MalString("");
                 }
                 if (a.length == 1) {
-                    return new MalString(a[0].toString());
+                    if (a[0] instanceof MalString) {
+                        return new MalString(a[0].toString());
+                    }
+                    return new MalString("\"" + a[0].toString() + "\"");
                 }
                 StringBuilder b = new StringBuilder();
                 b.append("\"");
@@ -185,7 +188,8 @@ public class Core {
             @Override
             public MalType operate(MalType[] a) throws Exception {
                 if (a.length == 0) {
-                    return new MalString("");
+                    System.out.println();
+                    return new MalNil();
                 }
                 StringBuilder b = new StringBuilder();
                 for (int i = 0; i < a.length - 1; i++) {
@@ -201,7 +205,8 @@ public class Core {
             @Override
             public MalType operate(MalType[] a) throws Exception {
                 if (a.length == 0) {
-                    return new MalString("");
+                    System.out.println();
+                    return new MalNil();
                 }
                 StringBuilder b = new StringBuilder();
                 for (int i = 0; i < a.length - 1; i++) {
