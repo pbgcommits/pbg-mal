@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalVector extends MalCollectionListType {
     public static final String VECTOR_START = "[";

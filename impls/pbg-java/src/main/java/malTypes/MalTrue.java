@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalTrue extends MalBoolean {
     public final static String TRUE = "true";

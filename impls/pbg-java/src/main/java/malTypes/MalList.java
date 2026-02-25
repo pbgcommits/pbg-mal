@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalList extends MalCollectionListType {
     public static final String LIST_START = "(";

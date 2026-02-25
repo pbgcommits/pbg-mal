@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalDouble extends MalType {
     private final double num;

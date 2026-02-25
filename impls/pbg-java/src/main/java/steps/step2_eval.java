@@ -1,22 +1,24 @@
+package main.java.steps;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import malTypes.MalCollectionListType;
-import malTypes.MalFunction;
-import malTypes.MalHashMap;
-import malTypes.MalHashMapKey;
-import malTypes.MalInteger;
-import malTypes.MalList;
-import malTypes.MalSymbol;
-import malTypes.MalType;
-import malTypes.MalVector;
+import main.java.Printer;
+import main.java.Reader;
+import main.java.ReplEnv;
+import main.java.malTypes.MalFunction;
+import main.java.malTypes.MalHashMap;
+import main.java.malTypes.MalHashMapKey;
+import main.java.malTypes.MalInteger;
+import main.java.malTypes.MalList;
+import main.java.malTypes.MalSymbol;
+import main.java.malTypes.MalType;
+import main.java.malTypes.MalVector;
 
-public class step3_env {
-    private final static String LIST_ERROR = "Invalid list format";
+public class step2_eval {
     public static void main(String args[]) {
         Scanner s = new Scanner(System.in);
-        step3_env repl = new step3_env();
+        step2_eval repl = new step2_eval();
         ReplEnv env = new ReplEnv();
         env.set(new MalSymbol("+"), new MalFunction() {
             @Override
@@ -82,87 +84,52 @@ public class step3_env {
     }
 
     
-    public String repl(String s, ReplEnv env) throws Exception {
-        return print(eval(read(s), env));
+    public String repl(String s, ReplEnv repl_env) throws Exception {
+        return print(eval(read(s), repl_env));
     }
     
     public MalType read(String s) throws Exception {
         return Reader.readStr(s);
     }
-    public MalType eval(MalType ast, ReplEnv env) throws Exception {
+    public MalType eval(MalType ast, ReplEnv repl_env) throws Exception {
         if (ast instanceof MalSymbol) {
             MalSymbol symbol = (MalSymbol) ast;
-            MalType val = env.get(symbol);
+            MalType val = repl_env.get(symbol);
             if (val == null) {
-                throw new Exception(symbol.toString() + " " + ReplEnv.LOOKUP_ERROR);
+                throw new Exception("not found");
             }
             return val;
         } else if (ast instanceof MalList) {
-            return this.apply(ast, env);
+            List<MalType> originalList = ((MalList) ast).getCollection();
+            if (originalList.size() == 0) {
+                return ast;
+            }
+            List<MalType> list = new ArrayList<>();
+            for (MalType m : originalList) {
+                list.add(this.eval(m, repl_env));
+            }
+            if (!(list.get(0) instanceof MalFunction)) {
+                throw new Exception("Invalid list format");
+            }
+            MalFunction first = (MalFunction) list.get(0);
+            return first.operate(list.subList(1, list.size()).toArray(new MalType[0]));
         } else if (ast instanceof MalVector) {
             MalVector ov = (MalVector) ast;
             MalVector v = new MalVector();
             for (MalType m : ov.getCollection()) {
-                v.add(this.eval(m, env));
+                v.add(this.eval(m, repl_env));
             }
             return v;
         } else if (ast instanceof MalHashMap) {
             MalHashMap og = (MalHashMap) ast;
             MalHashMap map = new MalHashMap();
             for (MalHashMapKey k : og.getCollection().keySet()) {
-                map.put(k, this.eval(og.getCollection().get(k), env));
+                map.put(k, this.eval(og.getCollection().get(k), repl_env));
             }
             return map;
         } else {
             return ast;
         }
-    }
-    private MalType apply(MalType ast, ReplEnv env) throws Exception {
-        List<MalType> originalList = ((MalList) ast).getCollection();
-        if (originalList.size() == 0) {
-            return ast;
-        }
-        if (originalList.get(0).toString().equals(ReplEnv.DEF_ENV_VAR_KW)) {
-            if (originalList.size() != 3) {
-                throw new Exception(LIST_ERROR);
-            }
-            if (!(originalList.get(1) instanceof MalSymbol)) {
-                throw new Exception(LIST_ERROR);
-            }
-            MalType value = this.eval(originalList.get(2), env);
-            env.set((MalSymbol) originalList.get(1), value);
-            return value;
-        }
-        else if (originalList.get(0).toString().equals(ReplEnv.LET_NEW_ENV_KW)) {
-            if (originalList.size() != 3) {
-                throw new Exception(LIST_ERROR);
-            }
-            if (!(originalList.get(1) instanceof MalCollectionListType)) {
-                throw new Exception(LIST_ERROR);
-            }
-            ReplEnv newEnv = new ReplEnv(env);
-            List<MalType> innerList = ((MalCollectionListType) originalList.get(1)).getCollection();
-            if (innerList.size() % 2 != 0) {
-                throw new Exception(LIST_ERROR);
-            }
-            for (int i = 0; i < innerList.size(); i += 2) {
-                if (!(innerList.get(i) instanceof MalSymbol)) {
-                    throw new Exception(LIST_ERROR);
-                }
-                newEnv.set((MalSymbol) innerList.get(i), this.eval(innerList.get(i+1), newEnv));
-            }
-            return this.eval(originalList.get(2), newEnv);
-        }
-        List<MalType> list = new ArrayList<>();
-        for (MalType m : originalList) {
-            list.add(this.eval(m, env));
-        }
-        if (!(list.get(0) instanceof MalFunction)) {
-            throw new Exception(LIST_ERROR);
-        }
-        MalFunction first = (MalFunction) list.get(0);
-        return first.operate(list.subList(1, list.size()).toArray(new MalType[0]));
-
     }
     public String print(MalType exp) {
         return Printer.pr_str(exp);

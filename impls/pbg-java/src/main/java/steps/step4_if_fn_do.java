@@ -1,17 +1,22 @@
+package main.java.steps;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import malTypes.MalCollectionListType;
-import malTypes.MalFalse;
-import malTypes.MalFunction;
-import malTypes.MalHashMap;
-import malTypes.MalHashMapKey;
-import malTypes.MalList;
-import malTypes.MalNil;
-import malTypes.MalSymbol;
-import malTypes.MalType;
-import malTypes.MalVector;
+import main.java.Core;
+import main.java.Printer;
+import main.java.Reader;
+import main.java.ReplEnv;
+import main.java.malTypes.MalCollectionListType;
+import main.java.malTypes.MalFalse;
+import main.java.malTypes.MalFunction;
+import main.java.malTypes.MalHashMap;
+import main.java.malTypes.MalHashMapKey;
+import main.java.malTypes.MalList;
+import main.java.malTypes.MalNil;
+import main.java.malTypes.MalSymbol;
+import main.java.malTypes.MalType;
+import main.java.malTypes.MalVector;
 
 public class step4_if_fn_do {
     private final static String LIST_ERROR = "Invalid list format";

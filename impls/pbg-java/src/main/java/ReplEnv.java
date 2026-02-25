@@ -1,10 +1,11 @@
+package main.java;
 import java.util.HashMap;
 import java.util.List;
 
-import malTypes.MalCollectionListType;
-import malTypes.MalList;
-import malTypes.MalSymbol;
-import malTypes.MalType;
+import main.java.malTypes.MalCollectionListType;
+import main.java.malTypes.MalList;
+import main.java.malTypes.MalSymbol;
+import main.java.malTypes.MalType;
 
 public class ReplEnv {
     private final HashMap<MalSymbol, MalType> data = new HashMap<>(); 

@@ -1,16 +1,17 @@
+package main.java;
 import java.util.HashMap;
 import java.util.Map;
 
-import malTypes.MalBoolean;
-import malTypes.MalFalse;
-import malTypes.MalFunction;
-import malTypes.MalInteger;
-import malTypes.MalList;
-import malTypes.MalNil;
-import malTypes.MalString;
-import malTypes.MalSymbol;
-import malTypes.MalTrue;
-import malTypes.MalType;
+import main.java.malTypes.MalBoolean;
+import main.java.malTypes.MalFalse;
+import main.java.malTypes.MalFunction;
+import main.java.malTypes.MalInteger;
+import main.java.malTypes.MalList;
+import main.java.malTypes.MalNil;
+import main.java.malTypes.MalString;
+import main.java.malTypes.MalSymbol;
+import main.java.malTypes.MalTrue;
+import main.java.malTypes.MalType;
 
 public class Core {
     private Map<MalSymbol, MalFunction> ns = new HashMap<>();

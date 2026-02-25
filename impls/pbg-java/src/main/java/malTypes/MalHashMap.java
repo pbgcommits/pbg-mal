@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 import java.util.HashMap;
 

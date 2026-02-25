@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalSymbol extends MalType implements MalHashMapKey {
     private final String symbol;

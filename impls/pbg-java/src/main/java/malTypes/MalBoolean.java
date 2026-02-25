@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public abstract class MalBoolean extends MalType {
     public static MalBoolean getBoolean(boolean b) {

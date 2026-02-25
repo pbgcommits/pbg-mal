@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 public abstract class MalType {
     public abstract String toString();
     @Override

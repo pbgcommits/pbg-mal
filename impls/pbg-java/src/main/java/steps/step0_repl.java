@@ -1,3 +1,4 @@
+package main.java.steps;
 import java.util.Scanner;
 
 public class step0_repl {

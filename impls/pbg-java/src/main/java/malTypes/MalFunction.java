@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public abstract class MalFunction extends MalType {
     public abstract MalType operate(MalType[] a) throws Exception;

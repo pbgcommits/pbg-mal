@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalNil extends MalType {
     public final static String NIL = "nil";

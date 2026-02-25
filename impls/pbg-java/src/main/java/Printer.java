@@ -1,5 +1,6 @@
-import malTypes.MalString;
-import malTypes.MalType;
+package main.java;
+import main.java.malTypes.MalString;
+import main.java.malTypes.MalType;
 
 public class Printer {
     public static String pr_str(MalType m) {

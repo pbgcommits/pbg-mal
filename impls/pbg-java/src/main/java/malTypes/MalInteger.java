@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalInteger extends MalType {
     private final int number;

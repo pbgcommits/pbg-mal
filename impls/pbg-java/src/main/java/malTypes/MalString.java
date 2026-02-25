@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public class MalString extends MalType implements MalHashMapKey {
     // !TODO - Evaluate strings appropriately

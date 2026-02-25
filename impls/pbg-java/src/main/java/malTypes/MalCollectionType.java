@@ -1,4 +1,4 @@
-package malTypes;
+package main.java.malTypes;
 
 public abstract class MalCollectionType extends MalType {
     public abstract void add(MalType m);

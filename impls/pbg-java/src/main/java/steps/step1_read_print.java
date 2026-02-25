@@ -1,6 +1,9 @@
+package main.java.steps;
 import java.util.Scanner;
 
-import malTypes.MalType;
+import main.java.Printer;
+import main.java.Reader;
+import main.java.malTypes.MalType;
 
 public class step1_read_print {
     public static void main(String args[]) {

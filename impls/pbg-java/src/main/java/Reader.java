@@ -1,3 +1,4 @@
+package main.java;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.MatchResult;
@@ -5,18 +6,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import malTypes.MalList;
-import malTypes.MalNil;
-import malTypes.MalString;
-import malTypes.MalCollectionType;
-import malTypes.MalDouble;
-import malTypes.MalFalse;
-import malTypes.MalHashMap;
-import malTypes.MalInteger;
-import malTypes.MalSymbol;
-import malTypes.MalTrue;
-import malTypes.MalType;
-import malTypes.MalVector;
+import main.java.malTypes.MalList;
+import main.java.malTypes.MalNil;
+import main.java.malTypes.MalString;
+import main.java.malTypes.MalCollectionType;
+import main.java.malTypes.MalDouble;
+import main.java.malTypes.MalFalse;
+import main.java.malTypes.MalHashMap;
+import main.java.malTypes.MalInteger;
+import main.java.malTypes.MalSymbol;
+import main.java.malTypes.MalTrue;
+import main.java.malTypes.MalType;
+import main.java.malTypes.MalVector;
 
 public class Reader {
 
