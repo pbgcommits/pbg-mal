@@ -156,7 +156,7 @@ public class Core {
                     b.append(" ");
                 }
                 b.append(Printer.pr_str(a[a.length-1], true));
-                return new MalString(b.toString());
+                return new MalString(MalString.getReadable(b.toString()));
             }
         });
         this.ns.put(new MalSymbol("str"), new MalFunction() {
@@ -166,12 +166,15 @@ public class Core {
                     return new MalString("");
                 }
                 StringBuilder b = new StringBuilder();
+                b.append("\"");
                 for (int i = 0; i < a.length - 1; i++) {
                     b.append(Printer.pr_str(a[i], false));
-                    b.append("");
                 }
                 b.append(Printer.pr_str(a[a.length-1], false));
-                return new MalString(b.toString());
+                b.append("\"");
+                MalString s = new MalString(b.toString());
+                // MalString s = new MalString(MalString.getReadable(b.toString()));
+                return s;
             }
         });
         this.ns.put(new MalSymbol("prn"), new MalFunction() {

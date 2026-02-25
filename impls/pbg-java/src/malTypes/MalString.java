@@ -35,14 +35,18 @@ public class MalString extends MalType implements MalHashMapKey {
         if (!printReadably) {
             return this.string;
         }
-        String unescapeBackSlash = this.string.replace("\\", "\\\\");
-        String unescapeQuote = unescapeBackSlash.replace("\"", "\\\"");
-        String unescapeNewLine = unescapeQuote.replace("\n", "\\n");
-        return "\"" + unescapeNewLine + "\"";
+        return getReadable(this.string);
     }
-
+    
     @Override
     public String toString() {
         return toString(true);
+    }
+    
+    public static String getReadable(String s) {
+        String unescapeBackSlash = s.replace("\\", "\\\\");
+        String unescapeQuote = unescapeBackSlash.replace("\"", "\\\"");
+        String unescapeNewLine = unescapeQuote.replace("\n", "\\n");
+        return "\"" + unescapeNewLine + "\"";
     }
 }
