@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import main.java.malTypes.MalBoolean;
+import main.java.malTypes.MalCollectionListType;
 import main.java.malTypes.MalFalse;
 import main.java.malTypes.MalFunction;
 import main.java.malTypes.MalInteger;
@@ -83,10 +84,10 @@ public class Core {
         this.ns.put(new MalSymbol("empty?"), new MalFunction() {
             @Override
             public MalType operate(MalType[] a) throws Exception {
-                if (!(a[0] instanceof MalList)) {
+                if (!(a[0] instanceof MalCollectionListType)) {
                     throw new Exception(LIST_ERROR);
                 }
-                return MalBoolean.getBoolean(((MalList) a[0]).getCollection().isEmpty());
+                return MalBoolean.getBoolean(((MalCollectionListType) a[0]).getCollection().isEmpty());
             }
         });
         this.ns.put(new MalSymbol("count"), new MalFunction() {
@@ -96,10 +97,10 @@ public class Core {
                     // Really strange behaviour specified by the tests
                     return new MalInteger(0);
                 }
-                if (!(a[0] instanceof MalList)) {
+                if (!(a[0] instanceof MalCollectionListType)) {
                     throw new Exception(LIST_ERROR);
                 }
-                return new MalInteger(((MalList) a[0]).getCollection().size());
+                return new MalInteger(((MalCollectionListType) a[0]).getCollection().size());
             }
         });
         this.ns.put(new MalSymbol("="), new MalFunction() {
