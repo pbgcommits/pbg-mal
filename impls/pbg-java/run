@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -cp $(dirname $0)/target/classes/mal/ main.java.steps.${STEP:-stepA_mal} "${@}"
+java -cp $(dirname $0)/target/classes/src/ main.java.steps.${STEP:-stepA_mal} "${@}"
