@@ -1,7 +1,6 @@
 package main.java.malTypes;
 
-public class MalString extends MalType implements MalHashMapKey {
-    // !TODO - Evaluate strings appropriately
+public class MalString extends MalHashMapKey {
     public final static String STRING_START = "\"";
     public final static String STRING_END = "\"";
     private final String string;
@@ -36,11 +35,6 @@ public class MalString extends MalType implements MalHashMapKey {
             return this.string;
         }
         return getReadable(this.string);
-    }
-    
-    @Override
-    public String toString() {
-        return toString(true);
     }
     
     public static String getReadable(String s) {

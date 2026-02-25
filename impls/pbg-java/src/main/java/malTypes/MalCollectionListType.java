@@ -19,11 +19,10 @@ public abstract class MalCollectionListType extends MalCollectionType {
     public abstract String getStart();
     @Override
     public abstract String getEnd();
-    @Override
-    public String toString() {
+    public String toString(boolean printReadably) {
         String[] stringList = new String[this.list.size()];
         for (int i = 0; i < this.list.size(); i++) {
-            stringList[i] = this.list.get(i).toString();
+            stringList[i] = this.list.get(i).toString(printReadably);
         }
         return this.getStart() + String.join(" ", stringList) + this.getEnd();
     }

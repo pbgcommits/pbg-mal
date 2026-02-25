@@ -1,5 +1,4 @@
 package main.java;
-import main.java.malTypes.MalString;
 import main.java.malTypes.MalType;
 
 public class Printer {
@@ -7,9 +6,6 @@ public class Printer {
         return pr_str(m, true);
     }
     public static String pr_str(MalType m, boolean printReadably) {
-        if (m instanceof MalString) {
-            return ((MalString) m).toString(printReadably);
-        }
-        return m.toString();
+        return m.toString(printReadably);
     }
 }

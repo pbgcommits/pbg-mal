@@ -9,7 +9,7 @@ public class MalInteger extends MalType {
         return this.number;
     }
     @Override
-    public String toString() {
+    public String toString(boolean printReadably) {
         return String.valueOf(this.number);
     }
     @Override

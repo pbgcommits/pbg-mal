@@ -1,5 +1,5 @@
 package main.java.malTypes;
 
-public interface MalHashMapKey {
+public abstract class MalHashMapKey extends MalType {
     
 }

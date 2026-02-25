@@ -26,7 +26,7 @@ public class MalFunctionWrapper extends MalType {
         return params;
     }
     @Override
-    public String toString() {
+    public String toString(boolean printReadably) {
         return fn.toString();
     }
 }

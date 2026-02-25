@@ -34,11 +34,11 @@ public class MalHashMap extends MalCollectionType {
         hashMap.put(key, value);
     }
     @Override
-    public String toString() {
+    public String toString(boolean printReadably) {
         StringBuilder b = new StringBuilder();
         b.append(this.getStart());
         for (MalHashMapKey key : this.hashMap.keySet()) {
-            b.append(key.toString() + " " + this.hashMap.get(key).toString());
+            b.append(key.toString(printReadably) + " " + this.hashMap.get(key).toString(printReadably));
         }
         b.append(this.getEnd());
         return b.toString();

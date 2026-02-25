@@ -166,6 +166,9 @@ public class Core {
                 if (a.length == 0) {
                     return new MalString("");
                 }
+                if (a.length == 1) {
+                    return new MalString(a[0].toString());
+                }
                 StringBuilder b = new StringBuilder();
                 b.append("\"");
                 for (int i = 0; i < a.length - 1; i++) {

@@ -1,6 +1,10 @@
 package main.java.malTypes;
 public abstract class MalType {
-    public abstract String toString();
+    @Override
+    public String toString() {
+        return this.toString(true);
+    }
+    public abstract String toString(boolean printReadably);
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
