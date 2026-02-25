@@ -10,6 +10,7 @@ import main.java.ReplEnv;
 import main.java.malTypes.MalCollectionListType;
 import main.java.malTypes.MalFalse;
 import main.java.malTypes.MalFunction;
+import main.java.malTypes.MalFunctionWrapper;
 import main.java.malTypes.MalHashMap;
 import main.java.malTypes.MalHashMapKey;
 import main.java.malTypes.MalList;
@@ -86,23 +87,27 @@ public class step5_tco {
                 }
                 MalType firstParam = originalList.get(0);
                 switch (firstParam.toString()) {
-                    case DO_KW:
-                        MalType ret = firstParam;
-                        for (int i = 1; i < originalList.size(); i++) {
-                            ret = this.eval(originalList.get(i), env);
+                    case DO_KW: {
+                        for (int i = 1; i < originalList.size() - 1; i++) {
+                            this.eval(originalList.get(i), env);
                         }
-                        return ret;
-                    case IF_KW:
+                        ast = originalList.get(originalList.size() - 1);
+                        break;
+                    }
+                    case IF_KW: {
                         if (originalList.size() < 2) {
                             throw new Exception(LIST_ERROR);
                         }
                         MalType condition = this.eval(originalList.get(1), env);
                         if (condition instanceof MalNil || condition instanceof MalFalse) {
                             if (originalList.size() < 4) return new MalNil();
-                            return this.eval(originalList.get(3), env);
+                            ast = originalList.get(3);
+                        } else {
+                            ast = originalList.get(2);
                         }
-                        return this.eval(originalList.get(2), env);
-                    case FN_KW:
+                        break;
+                    }
+                    case FN_KW: {
                         /**
                          * Given (fn* (a) (+ 1 a)), we wait for the function to be called,
                          * then create an environment binding a to the called function's parameter,
@@ -112,15 +117,17 @@ public class step5_tco {
                             throw new Exception(LIST_ERROR);
                         }
                         MalCollectionListType params = (MalCollectionListType) originalList.get(1);
+                        final ReplEnv dupEnv = env;
                         MalFunction f = new MalFunction() {
                             @Override
                             public MalType operate(MalType[] a) throws Exception {
-                                ReplEnv newEnv = new ReplEnv(env, params, a);
+                                ReplEnv newEnv = new ReplEnv(dupEnv, params, a);
                                 return step5_tco.this.eval(originalList.get(2), newEnv);
                             }
                         };
-                        return f;
-                    case ReplEnv.DEF_ENV_VAR_KW:
+                        return new MalFunctionWrapper(originalList.get(2), params, env, f);
+                    }
+                    case ReplEnv.DEF_ENV_VAR_KW: {
                         if (originalList.size() != 3) {
                             throw new Exception(LIST_ERROR);
                         }
@@ -130,7 +137,8 @@ public class step5_tco {
                         MalType value = this.eval(originalList.get(2), env);
                         env.set((MalSymbol) originalList.get(1), value);
                         return value;
-                    case ReplEnv.LET_NEW_ENV_KW:
+                    }
+                    case ReplEnv.LET_NEW_ENV_KW: {
                         if (originalList.size() != 3) {
                             throw new Exception(LIST_ERROR);
                         }
@@ -148,17 +156,32 @@ public class step5_tco {
                             }
                             newEnv.set((MalSymbol) innerList.get(i), this.eval(innerList.get(i+1), newEnv));
                         }
-                        return this.eval(originalList.get(2), newEnv);
-                    default:
+                        ast = originalList.get(2);
+                        env = newEnv;
+                        break;
+                        // return this.eval(originalList.get(2), newEnv);
+                    }
+                    default: {
+                        // ---apply---
                         List<MalType> list = new ArrayList<>();
                         for (MalType m : originalList) {
                             list.add(this.eval(m, env));
                         }
-                        if (!(list.get(0) instanceof MalFunction)) {
+                        if (list.get(0) instanceof MalFunction) {
+                            MalFunction first = (MalFunction) list.get(0);
+                            return first.operate(list.subList(1, list.size()).toArray(new MalType[0]));
+                        } else if (list.get(0) instanceof MalFunctionWrapper) {
+                            MalFunctionWrapper wrapper = (MalFunctionWrapper) list.get(0);
+                            ast = wrapper.getAst();
+                            ReplEnv newEnv = new ReplEnv(wrapper.getEnv(), wrapper.getParams(), 
+                                list.subList(1, list.size()).toArray(new MalType[0])
+                            );
+                            env = newEnv;
+                        } else {
                             throw new Exception(LIST_ERROR);
                         }
-                        MalFunction first = (MalFunction) list.get(0);
-                        return first.operate(list.subList(1, list.size()).toArray(new MalType[0]));
+                        break;
+                    }
                 }
             } else if (ast instanceof MalVector) {
                 MalVector ov = (MalVector) ast;
@@ -179,7 +202,7 @@ public class step5_tco {
             }
         }
     }
-    
+
     public String print(MalType exp) {
         return Printer.pr_str(exp);
     }
