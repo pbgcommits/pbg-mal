@@ -104,25 +104,24 @@ public class Reader {
             return new MalSymbol(s);
         }
         if (s.startsWith(COMMENT_START)) {
-            // If the input is an atom not enclosed in a list
             return null;
         }
-        if (s.startsWith(MalQuote.START)) {
-            return new MalQuote(this.readForm().toString());
+        if (s.equals(MalQuote.START)) {
+            return new MalQuote(this.readForm());
         }
-        if (s.startsWith(MalSpliceUnquote.START)) {
-            return new MalSpliceUnquote(this.readForm().toString());
+        if (s.equals(MalSpliceUnquote.START)) {
+            return new MalSpliceUnquote(this.readForm());
         }
-        if (s.startsWith(MalUnquote.START)) {
-            return new MalUnquote(this.readForm().toString());
+        if (s.equals(MalUnquote.START)) {
+            return new MalUnquote(this.readForm());
         }
-        if (s.startsWith(MalQuasiQuote.START)) {
-            return new MalQuasiQuote(this.readForm().toString());
+        if (s.equals(MalQuasiQuote.START)) {
+            return new MalQuasiQuote(this.readForm());
         }
-        if (s.startsWith(MalDeref.START)) {
+        if (s.equals(MalDeref.START)) {
             return new MalDeref(this.readForm());
         }
-        if (s.startsWith(MalMetadata.START)) {
+        if (s.equals(MalMetadata.START)) {
             MalType metadata = this.readForm();
             MalType data = this.readForm();
             return new MalMetadata(data, metadata);

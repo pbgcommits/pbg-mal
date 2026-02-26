@@ -1,20 +1,20 @@
 package main.java.malTypes;
 
-public class MalMetadata extends MalType {
+import java.util.List;
+
+public class MalMetadata extends MalList {
     public final static String START = "^";
-    private MalType data, metadata;
+    public final static MalSymbol SYMBOL = new MalSymbol("with-meta");
     public MalMetadata(MalType data, MalType metadata) {
-        this.data = data;
-        this.metadata = metadata;
+        List<MalType> list = getCollection();
+        list.add(MalMetadata.SYMBOL);
+        list.add(data);
+        list.add(metadata);
     }
     public MalType getData() {
-        return data;
+        return getCollection().get(1);
     }
     public MalType getMetadata() {
-        return metadata;
-    }
-    @Override
-    public String toString(boolean printReadably) {
-        return "(with-meta " + this.data.toString() + " " + this.metadata.toString() + ")";
+        return getCollection().get(2);
     }
 }

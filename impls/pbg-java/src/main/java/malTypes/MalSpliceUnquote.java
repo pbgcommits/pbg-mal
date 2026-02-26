@@ -1,16 +1,13 @@
 package main.java.malTypes;
 
-public class MalSpliceUnquote extends MalType {
+import java.util.List;
+
+public class MalSpliceUnquote extends MalList {
     public final static String START = "~@";
-    private String string;
-    public MalSpliceUnquote(String s) {
-        this.string = s;
-    }
-    public String getString() {
-        return string;
-    }
-    @Override
-    public String toString(boolean printReadably) {
-        return "(splice-unquote " + this.string + ")";
+    public final static MalSymbol SYMBOL = new MalSymbol("splice-unquote");
+    public MalSpliceUnquote(MalType t) {
+        List<MalType> list = getCollection();
+        list.add(MalSpliceUnquote.SYMBOL);
+        list.add(t);
     }
 }

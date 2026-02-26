@@ -20,6 +20,7 @@ import main.java.malTypes.MalString;
 import main.java.malTypes.MalSymbol;
 import main.java.malTypes.MalTrue;
 import main.java.malTypes.MalType;
+import main.java.malTypes.MalVector;
 
 public class Core {
     private Map<MalSymbol, MalFunction> ns = new HashMap<>();
@@ -307,6 +308,53 @@ public class Core {
                 atom.setValue(result);
                 return result;
             } 
+        });
+        this.ns.put(new MalSymbol("cons"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 2);
+                if (!(a[1] instanceof MalCollectionListType)) {
+                    throw new Exception(LIST_ERROR);
+                }
+                MalList list = new MalList();
+                list.add(a[0]);
+                for (MalType x : ((MalCollectionListType) a[1]).getCollection()) {
+                    list.add(x);
+                }
+                return list;
+            }
+        });
+        this.ns.put(new MalSymbol("concat"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                MalList list = new MalList();
+                for (MalType t : a) {
+                    if (!(t instanceof MalCollectionListType)) {
+                        throw new Exception(LIST_ERROR);
+                    }
+                    for (MalType t1 : ((MalCollectionListType) t).getCollection()) {
+                        list.add(t1);
+                    }
+                }
+                return list;
+            }
+        });
+        this.ns.put(new MalSymbol("vec"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (a[0] instanceof MalVector)  {
+                    return a[0];
+                } else if (a[0] instanceof MalList) {
+                    MalVector v = new MalVector();
+                    for (MalType t : ((MalList) a[0]).getCollection()) {
+                        v.add(t);
+                    }
+                    return v;
+                } else {
+                    throw new Exception(LIST_ERROR);
+                }
+            }
         });
     }
     private void verifyLengthAtLeast(MalType[] a, int l) throws Exception {

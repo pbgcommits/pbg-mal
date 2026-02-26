@@ -1,16 +1,13 @@
 package main.java.malTypes;
 
-public class MalQuasiQuote extends MalType {
+import java.util.List;
+
+public class MalQuasiQuote extends MalList {
     public final static String START = "`";
-    private String string;
-    public MalQuasiQuote(String s) {
-        this.string = s;
-    }
-    public String getString() {
-        return string;
-    }
-    @Override
-    public String toString(boolean printReadably) {
-        return "(quasiquote " + this.string + ")";
+    public final static MalSymbol SYMBOL = new MalSymbol("quasiquote");
+    public MalQuasiQuote(MalType t) {
+        List<MalType> list = getCollection();
+        list.add(MalQuasiQuote.SYMBOL);
+        list.add(t);
     }
 }

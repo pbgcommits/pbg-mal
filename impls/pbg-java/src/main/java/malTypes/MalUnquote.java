@@ -1,16 +1,13 @@
 package main.java.malTypes;
 
-public class MalUnquote extends MalType {
+import java.util.List;
+
+public class MalUnquote extends MalList {
     public final static String START = "~";
-    private String string;
-    public MalUnquote(String s) {
-        this.string = s;
-    }
-    public String getString() {
-        return string;
-    }
-    @Override
-    public String toString(boolean printReadably) {
-        return "(unquote " + this.string + ")";
+    public final static MalSymbol SYMBOL = new MalSymbol("unquote");
+    public MalUnquote(MalType t) {
+        List<MalType> list = getCollection();
+        list.add(MalUnquote.SYMBOL);
+        list.add(t);
     }
 }

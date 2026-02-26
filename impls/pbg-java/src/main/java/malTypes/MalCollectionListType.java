@@ -1,3 +1,4 @@
+/** Lists and vectors. */
 package main.java.malTypes;
 
 import java.util.ArrayList;
@@ -10,6 +11,12 @@ public abstract class MalCollectionListType extends MalCollectionType {
     }
     public List<MalType> getCollection() {
         return this.list;
+    }
+    public int size() {
+        return this.list.size();
+    }
+    public MalType get(int i) {
+        return this.list.get(i);
     }
     @Override
     public void add(MalType m) {
