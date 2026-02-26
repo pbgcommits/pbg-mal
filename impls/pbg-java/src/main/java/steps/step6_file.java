@@ -15,6 +15,7 @@ import main.java.malTypes.MalHashMap;
 import main.java.malTypes.MalHashMapKey;
 import main.java.malTypes.MalList;
 import main.java.malTypes.MalNil;
+import main.java.malTypes.MalString;
 import main.java.malTypes.MalSymbol;
 import main.java.malTypes.MalType;
 import main.java.malTypes.MalVector;
@@ -47,10 +48,18 @@ public class step6_file {
             repl.repl(
                 "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\\nnil)\")))))", 
                 env);
-            // repl.repl("def! load-file (fn* (f) (slurp f))", env);
+            MalList argv = new MalList();
+            for (int i = 1; i < args.length; i++) {
+                argv.add(new MalString(args[i], false));
+            }
+            env.set(new MalSymbol("*ARGV*"), argv);
+            if (args.length > 0) {
+                repl.repl("(load-file \"" + args[0] + "\")", env);
+                s.close();
+                return;
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println("Aborting early");
+            System.out.println(e.getMessage() + "\nAborting early.");
             s.close();
             return;
         }

@@ -6,12 +6,21 @@ public class MalString extends MalHashMapKey {
     private final String string;
     private final static String ESCAPE_CHAR_MESSAGE = "unbalanced";
     // private final static String ESCAPE_CHAR_MESSAGE = "Invalid escape sequence (must be one of \\n, \\\", \\\\)";
+    /**
+     * This constructor assumes s has s[0] == " and s[s.length-1] == ".
+     * @throws Exception If an escape character ('\') isn't followed by a valid escape sequence.
+     */
     public MalString(String s) throws Exception {
+        this(s, true);
+    }
+    public MalString(String s, boolean quoted) throws Exception {
         int sLength = s.length();
         StringBuilder builder = new StringBuilder();
         char[] sc = s.toCharArray();
         // [1, sLength-1] to remove enclosing double quotes
-        for (int i = 1; i < sLength - 1; i++) {
+        int start = quoted ? 1 : 0;
+        int end = quoted ? sLength - 1 : sLength;
+        for (int i = start; i < end; i++) {
             if (sc[i] == '\\') {
                 if (i + 1 == sLength - 1) {
                     throw new Exception(ESCAPE_CHAR_MESSAGE);

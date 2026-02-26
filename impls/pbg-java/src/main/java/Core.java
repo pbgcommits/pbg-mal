@@ -178,7 +178,7 @@ public class Core {
                     if (a[0] instanceof MalString) {
                         return new MalString(a[0].toString());
                     }
-                    return new MalString("\"" + a[0].toString() + "\"");
+                    return new MalString(a[0].toString(), false);
                 }
                 StringBuilder b = new StringBuilder();
                 b.append("\"");
@@ -242,7 +242,7 @@ public class Core {
                 Path p = Path.of(a[0].toString(false));
                 try {
                     String s = Files.readString(p, StandardCharsets.UTF_8);
-                    return new MalString("\"" + s + "\"");
+                    return new MalString(s, false);
                 } catch (IOException e) {
                     throw new Exception("IOException: " + e.getMessage());
                 }
