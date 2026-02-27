@@ -250,9 +250,14 @@ public class step7_quote {
     }
 
     private MalType quasiquote(MalType ast) throws Exception {
-        if (ast instanceof MalCollectionListType) {
+        return quasiquote(ast, false);
+    }
+
+    /** toList should only be true when wishing to treat a vector as a list. */
+    private MalType quasiquote(MalType ast, boolean toList) throws Exception {
+        if (ast instanceof MalList || ((ast instanceof MalVector && toList))) {
             List<MalType> list = ((MalCollectionListType) ast).getCollection();
-            if (list.size() >= 1 && list.get(0).equals(MalUnquote.SYMBOL)) {
+            if (!toList && list.size() >= 1 && list.get(0).equals(MalUnquote.SYMBOL)) {
                 if (list.size() < 2) {
                     throw new Exception(LIST_ERROR);
                 }
@@ -282,10 +287,14 @@ public class step7_quote {
                 }
                 return newList;
             }
+        } else if (ast instanceof MalVector) {
+            MalList list = new MalList();
+            list.add(new MalSymbol("vec"));
+            list.add(quasiquote(ast, true));
+            return list;
         } else if ((ast instanceof MalHashMap) || (ast instanceof MalSymbol)) {
             return new MalQuote(ast);
-        }
-        else {
+        } else {
             return ast;
         }
     }

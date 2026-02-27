@@ -43,4 +43,13 @@ public abstract class MalCollectionListType extends MalCollectionType {
         }
         return ((MalCollectionListType) o).getCollection().equals(this.getCollection());
     }
+    public static MalCollectionListType newCollectionList(MalCollectionListType t) {
+        if (t instanceof MalList) {
+            return new MalList();
+        } else if (t instanceof MalVector) {
+            return new MalVector();
+        } else {
+            return null;
+        }
+    }
 }
