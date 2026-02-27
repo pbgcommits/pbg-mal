@@ -12,6 +12,7 @@ public class Env {
     private Env outer = null;
     public final static String DEF_ENV_VAR_KW = "def!";
     public final static String LET_NEW_ENV_KW = "let*";
+    public final static String DEF_MACRO_KW = "defmacro!";
     public final static String LOOKUP_ERROR = "not found.";
     public Env() {}
     public Env(Env outer) {

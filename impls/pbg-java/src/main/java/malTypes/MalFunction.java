@@ -2,7 +2,7 @@ package main.java.malTypes;
 
 public abstract class MalFunction extends MalType {
     public abstract MalType operate(MalType[] a) throws Exception;
-    private final boolean isMacro;
+    private boolean isMacro;
     public MalFunction() {
         this(false);
     }
@@ -11,6 +11,9 @@ public abstract class MalFunction extends MalType {
     }
     public boolean isMacro() {
         return isMacro;
+    }
+    public void setMacro(boolean isMacro) {
+        this.isMacro = isMacro;
     }
     public String toString(boolean printReadably) {
         return "#<function>";
