@@ -14,6 +14,7 @@ import main.java.malTypes.MalFunctionWrapper;
 import main.java.malTypes.MalHashMap;
 import main.java.malTypes.MalHashMapKey;
 import main.java.malTypes.MalList;
+import main.java.malTypes.MalMacroFunction;
 import main.java.malTypes.MalNil;
 import main.java.malTypes.MalQuote;
 import main.java.malTypes.MalSpliceUnquote;
@@ -24,7 +25,6 @@ import main.java.malTypes.MalUnquote;
 import main.java.malTypes.MalVector;
 
 public class step8_macros {
-    private final static String LIST_ERROR = "Invalid list format";
     private final static String DO_KW = "do";
     private final static String IF_KW = "if";
     private final static String FN_KW = "fn*";
@@ -42,9 +42,7 @@ public class step8_macros {
             step8_macros x = new step8_macros();
             @Override
             public MalType operate(MalType[] a) throws Exception {
-                if (a.length < 1) {
-                    throw new Exception(LIST_ERROR);
-                }
+                x.verifyLengthAtLeast(a, 1);
                 return x.eval(a[0], env);
             }
         });
@@ -103,7 +101,7 @@ public class step8_macros {
         while (true) {
             MalType debug = env.get(new MalSymbol("DEBUG-EVAL"));
             if (debug != null && !(debug instanceof MalFalse) && !(debug instanceof MalNil)) {
-                System.out.println("EVAL: " + Printer.pr_str(ast, true) + "\nclass: " + ast.getClass());
+                System.out.println("EVAL: " + Printer.pr_str(ast, true) + ", class: " + ast.getClass());
             }
             if (ast instanceof MalSymbol) {
                 MalSymbol symbol = (MalSymbol) ast;
@@ -145,7 +143,8 @@ public class step8_macros {
                          */
                         verifyLengthAtLeast(originalList, 3);
                         if (!(originalList.get(1) instanceof MalCollectionListType)) {
-                            throw new Exception(LIST_ERROR);
+                            throw new Exception("Expected fn params to be list/vector, got " 
+                                                + originalList.get(1).getClass());
                         }
                         MalCollectionListType params = (MalCollectionListType) originalList.get(1);
                         final Env dupEnv = env;
@@ -173,46 +172,48 @@ public class step8_macros {
                             throw new Exception("Macro name should be simple symbol.");
                         }
                         MalType macroValue = this.eval(originalList.get(2), env);
+                        MalMacroFunction macro;
                         if (macroValue instanceof MalFunctionWrapper) {
-                            ((MalFunctionWrapper) macroValue).getFn().setMacro(true);
-                        } else if (macroValue instanceof MalFunction) {
-                            ((MalFunction) macroValue).setMacro(true);
-                        } else {
+                            macro = new MalMacroFunction(((MalFunctionWrapper) macroValue).getFn());
+                        } 
+                        else if (macroValue instanceof MalFunction) {
+                            macro = new MalMacroFunction((MalFunction) macroValue);
+                        } 
+                        else {
                             throw new Exception("Expected function for macro; got " 
                             + originalList.get(2).getClass());
                         }
-                        env.set((MalSymbol) originalList.get(1), macroValue);
-                        return macroValue;
+                        env.set((MalSymbol) originalList.get(1), macro);
+                        return macro;
                     }
                     case Env.DEF_ENV_VAR_KW: {
                         verifyLengthAtLeast(originalList, 3);
                         if (!(originalList.get(1) instanceof MalSymbol)) {
-                            throw new Exception(LIST_ERROR);
+                            throw new Exception("Expected symbol, got " + originalList.get(1).getClass());
                         }
                         MalType value = this.eval(originalList.get(2), env);
                         env.set((MalSymbol) originalList.get(1), value);
                         return value;
                     }
                     case Env.LET_NEW_ENV_KW: {
-                        verifyLengthAtLeast(originalList, 3);
+                        verifyLengthAtLeast(originalList, 2);
                         if (!(originalList.get(1) instanceof MalCollectionListType)) {
-                            throw new Exception(LIST_ERROR);
+                            throw new Exception("Expected list/vector, got " + originalList.get(1).getClass());
                         }
                         Env newEnv = new Env(env);
                         List<MalType> innerList = ((MalCollectionListType) originalList.get(1)).getCollection();
                         if (innerList.size() % 2 != 0) {
-                            throw new Exception(LIST_ERROR);
+                            throw new Exception("Expected list with even number of items");
                         }
                         for (int i = 0; i < innerList.size(); i += 2) {
                             if (!(innerList.get(i) instanceof MalSymbol)) {
-                                throw new Exception(LIST_ERROR);
+                                throw new Exception("Expected symbol, got " + innerList.get(i));
                             }
                             newEnv.set((MalSymbol) innerList.get(i), this.eval(innerList.get(i+1), newEnv));
                         }
-                        ast = originalList.get(2);
+                        ast = originalList.size() > 2 ? originalList.get(2) : new MalNil();
                         env = newEnv;
                         break;
-                        // return this.eval(originalList.get(2), newEnv);
                     }
                     default: {
                         // ---apply---
@@ -221,24 +222,18 @@ public class step8_macros {
                         for (int i = 1; i < originalList.size(); i++) {
                             evaluatedArgs.add(this.eval(originalList.get(i), env));
                         }
-                        if (first instanceof MalFunction) {
-                            MalFunction func = (MalFunction) first;
-                            if (func.isMacro()) {
-                                System.out.println("Is macro: unevaluating");
-                                List<MalType> unevaluatedArgs = originalList.subList(1, originalList.size());
-                                ast = func.operate(unevaluatedArgs.toArray(new MalType[0]));
-                            } else {
-                                return func.operate(evaluatedArgs.toArray(new MalType[0]));
-                            }
+                        if (first instanceof MalMacroFunction) {
+                            List<MalType> unevaluatedArgs = originalList.subList(1, originalList.size());
+                            ast = ((MalMacroFunction) first).getFunction()
+                                                            .operate(unevaluatedArgs.toArray(new MalType[0]));
+                        } else if (first instanceof MalFunction) {
+                            return ((MalFunction)first).operate(evaluatedArgs.toArray(new MalType[0]));
                         } else if (first instanceof MalFunctionWrapper) {
                             MalFunctionWrapper wrapper = (MalFunctionWrapper) first;
                             ast = wrapper.getAst();
-                            Env newEnv = new Env(wrapper.getEnv(), wrapper.getParams(), 
-                                evaluatedArgs.toArray(new MalType[0])
-                            );
-                            env = newEnv;
+                            env = new Env(wrapper.getEnv(), wrapper.getParams(), evaluatedArgs.toArray(new MalType[0]));
                         } else {
-                            throw new Exception(LIST_ERROR);
+                            throw new Exception("Cannot call " + first + " as a function");
                         }
                         break;
                     }
@@ -322,4 +317,10 @@ public class step8_macros {
             throw new Exception("Expected at least" + length + " arguments; got " + list.size());
         }
     }
+    private void verifyLengthAtLeast(MalType[] a, int length) throws Exception {
+        if (a.length < length) {
+            throw new Exception("Expected at least" + length + " arguments; got " + a.length);
+        }
+    }
+    
 }
