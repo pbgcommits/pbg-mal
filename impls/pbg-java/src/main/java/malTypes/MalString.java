@@ -13,6 +13,11 @@ public class MalString extends MalHashMapKey {
     public MalString(String s) throws Exception {
         this(s, true);
     }
+    /**
+     * @param s 
+     * @param quoted Should be set to true if the string is known to be surrounded by quotation marks.
+     * @throws Exception
+     */
     public MalString(String s, boolean quoted) throws Exception {
         int sLength = s.length();
         StringBuilder builder = new StringBuilder();

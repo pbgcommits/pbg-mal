@@ -15,28 +15,56 @@ import main.java.malTypes.MalHashMap;
 import main.java.malTypes.MalHashMapKey;
 import main.java.malTypes.MalList;
 import main.java.malTypes.MalNil;
+import main.java.malTypes.MalQuote;
+import main.java.malTypes.MalSpliceUnquote;
+import main.java.malTypes.MalString;
 import main.java.malTypes.MalSymbol;
 import main.java.malTypes.MalType;
+import main.java.malTypes.MalUnquote;
 import main.java.malTypes.MalVector;
 
-public class step5_tco {
+public class step8_macros {
     private final static String LIST_ERROR = "Invalid list format";
     private final static String DO_KW = "do";
     private final static String IF_KW = "if";
     private final static String FN_KW = "fn*";
+    private final static String QUOTE_KW = "quote";
+    private final static String QUASIQUOTE_KW = "quasiquote";
     public static void main(String args[]) {
         Scanner s = new Scanner(System.in);
-        step5_tco repl = new step5_tco();
+        step8_macros repl = new step8_macros();
         Env env = new Env();
         Core core = new Core();
         for (MalSymbol key : core.getNameSpace().keySet()) {
             env.set(key, core.getNameSpace().get(key));
         }
+        env.set(new MalSymbol("eval"), new MalFunction() {
+            step8_macros x = new step8_macros();
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                if (a.length < 1) {
+                    throw new Exception(LIST_ERROR);
+                }
+                return x.eval(a[0], env);
+            }
+        });
         try {
             repl.repl("(def! not (fn* (a) (if a false true)))", env);
+            repl.repl(
+                "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\\nnil)\")))))", 
+                env);
+            MalList argv = new MalList();
+            for (int i = 1; i < args.length; i++) {
+                argv.add(new MalString(args[i], false));
+            }
+            env.set(new MalSymbol("*ARGV*"), argv);
+            if (args.length > 0) {
+                repl.repl("(load-file \"" + args[0] + "\")", env);
+                s.close();
+                return;
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println("Aborting early");
+            System.out.println(e.getMessage() + "\nAborting early.");
             s.close();
             return;
         }
@@ -73,6 +101,10 @@ public class step5_tco {
     }
     public MalType eval(MalType ast, Env env) throws Exception {
         while (true) {
+            MalType debug = env.get(new MalSymbol("DEBUG-EVAL"));
+            if (debug != null && !(debug instanceof MalFalse) && !(debug instanceof MalNil)) {
+                System.out.println("EVAL: " + Printer.pr_str(ast, true));
+            }
             if (ast instanceof MalSymbol) {
                 MalSymbol symbol = (MalSymbol) ast;
                 MalType val = env.get(symbol);
@@ -122,10 +154,20 @@ public class step5_tco {
                             @Override
                             public MalType operate(MalType[] a) throws Exception {
                                 Env newEnv = new Env(dupEnv, params, a);
-                                return step5_tco.this.eval(originalList.get(2), newEnv);
+                                return step8_macros.this.eval(originalList.get(2), newEnv);
                             }
                         };
                         return new MalFunctionWrapper(originalList.get(2), params, env, f);
+                    }
+                    case QUOTE_KW: {
+                        if (originalList.size() < 2) {
+                            throw new Exception(LIST_ERROR);
+                        }
+                        return originalList.get(1);
+                    }
+                    case QUASIQUOTE_KW: {
+                        ast = quasiquote(originalList.get(1));
+                        break;
                     }
                     case Env.DEF_ENV_VAR_KW: {
                         if (originalList.size() != 3) {
@@ -205,5 +247,55 @@ public class step5_tco {
 
     public String print(MalType exp) {
         return Printer.pr_str(exp);
+    }
+
+    private MalType quasiquote(MalType ast) throws Exception {
+        return quasiquote(ast, false);
+    }
+
+    /** toList should only be true when wishing to treat a vector as a list. */
+    private MalType quasiquote(MalType ast, boolean toList) throws Exception {
+        if (ast instanceof MalList || ((ast instanceof MalVector && toList))) {
+            List<MalType> list = ((MalCollectionListType) ast).getCollection();
+            if (!toList && list.size() >= 1 && list.get(0).equals(MalUnquote.SYMBOL)) {
+                if (list.size() < 2) {
+                    throw new Exception(LIST_ERROR);
+                }
+                return list.get(1);
+            } else {
+                MalList newList = new MalList();
+                for (int i = list.size() - 1; i >= 0; i--) {
+                    MalList newNewList = new MalList();
+                    MalType elt = list.get(i);
+                    if (elt instanceof MalCollectionListType
+                        && (((MalCollectionListType) elt).size() >= 1)
+                        && (((MalCollectionListType) elt).get(0).equals(MalSpliceUnquote.SYMBOL))
+                    ) {
+                        MalCollectionListType eltList = (MalCollectionListType) elt;
+                        if (eltList.size() < 2) {
+                            throw new Exception(LIST_ERROR);
+                        }
+                        newNewList.add(new MalSymbol("concat"));
+                        newNewList.add(eltList.get(1));
+                        newNewList.add(newList);
+                    } else {
+                        newNewList.add(new MalSymbol("cons"));
+                        newNewList.add(quasiquote(elt));
+                        newNewList.add(newList);
+                    }
+                    newList = newNewList;
+                }
+                return newList;
+            }
+        } else if (ast instanceof MalVector) {
+            MalList list = new MalList();
+            list.add(new MalSymbol("vec"));
+            list.add(quasiquote(ast, true));
+            return list;
+        } else if ((ast instanceof MalHashMap) || (ast instanceof MalSymbol)) {
+            return new MalQuote(ast);
+        } else {
+            return ast;
+        }
     }
 }

@@ -7,17 +7,17 @@ import main.java.malTypes.MalList;
 import main.java.malTypes.MalSymbol;
 import main.java.malTypes.MalType;
 
-public class ReplEnv {
+public class Env {
     private final HashMap<MalSymbol, MalType> data = new HashMap<>(); 
-    private ReplEnv outer = null;
+    private Env outer = null;
     public final static String DEF_ENV_VAR_KW = "def!";
     public final static String LET_NEW_ENV_KW = "let*";
     public final static String LOOKUP_ERROR = "not found.";
-    public ReplEnv() {}
-    public ReplEnv(ReplEnv outer) {
+    public Env() {}
+    public Env(Env outer) {
         this.outer = outer;
     }
-    public ReplEnv(ReplEnv outer, MalCollectionListType binds, MalType[] params) throws Exception {
+    public Env(Env outer, MalCollectionListType binds, MalType[] params) throws Exception {
         this(outer);
         List<MalType> list = binds.getCollection(); 
         for (int i = 0; i < list.size(); i++) {

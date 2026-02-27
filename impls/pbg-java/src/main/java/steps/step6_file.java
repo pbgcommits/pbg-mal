@@ -6,7 +6,7 @@ import java.util.Scanner;
 import main.java.Core;
 import main.java.Printer;
 import main.java.Reader;
-import main.java.ReplEnv;
+import main.java.Env;
 import main.java.malTypes.MalCollectionListType;
 import main.java.malTypes.MalFalse;
 import main.java.malTypes.MalFunction;
@@ -28,7 +28,7 @@ public class step6_file {
     public static void main(String args[]) {
         Scanner s = new Scanner(System.in);
         step6_file repl = new step6_file();
-        ReplEnv env = new ReplEnv();
+        Env env = new Env();
         Core core = new Core();
         for (MalSymbol key : core.getNameSpace().keySet()) {
             env.set(key, core.getNameSpace().get(key));
@@ -87,20 +87,20 @@ public class step6_file {
     }
 
     
-    public String repl(String s, ReplEnv env) throws Exception {
+    public String repl(String s, Env env) throws Exception {
         return print(eval(read(s), env));
     }
     
     public MalType read(String s) throws Exception {
         return Reader.readStr(s);
     }
-    public MalType eval(MalType ast, ReplEnv env) throws Exception {
+    public MalType eval(MalType ast, Env env) throws Exception {
         while (true) {
             if (ast instanceof MalSymbol) {
                 MalSymbol symbol = (MalSymbol) ast;
                 MalType val = env.get(symbol);
                 if (val == null) {
-                    throw new Exception(symbol.toString() + " " + ReplEnv.LOOKUP_ERROR);
+                    throw new Exception(symbol.toString() + " " + Env.LOOKUP_ERROR);
                 }
                 return val;
             } else if (ast instanceof MalList) {
@@ -140,17 +140,17 @@ public class step6_file {
                             throw new Exception(LIST_ERROR);
                         }
                         MalCollectionListType params = (MalCollectionListType) originalList.get(1);
-                        final ReplEnv dupEnv = env;
+                        final Env dupEnv = env;
                         MalFunction f = new MalFunction() {
                             @Override
                             public MalType operate(MalType[] a) throws Exception {
-                                ReplEnv newEnv = new ReplEnv(dupEnv, params, a);
+                                Env newEnv = new Env(dupEnv, params, a);
                                 return step6_file.this.eval(originalList.get(2), newEnv);
                             }
                         };
                         return new MalFunctionWrapper(originalList.get(2), params, env, f);
                     }
-                    case ReplEnv.DEF_ENV_VAR_KW: {
+                    case Env.DEF_ENV_VAR_KW: {
                         if (originalList.size() != 3) {
                             throw new Exception(LIST_ERROR);
                         }
@@ -161,14 +161,14 @@ public class step6_file {
                         env.set((MalSymbol) originalList.get(1), value);
                         return value;
                     }
-                    case ReplEnv.LET_NEW_ENV_KW: {
+                    case Env.LET_NEW_ENV_KW: {
                         if (originalList.size() != 3) {
                             throw new Exception(LIST_ERROR);
                         }
                         if (!(originalList.get(1) instanceof MalCollectionListType)) {
                             throw new Exception(LIST_ERROR);
                         }
-                        ReplEnv newEnv = new ReplEnv(env);
+                        Env newEnv = new Env(env);
                         List<MalType> innerList = ((MalCollectionListType) originalList.get(1)).getCollection();
                         if (innerList.size() % 2 != 0) {
                             throw new Exception(LIST_ERROR);
@@ -196,7 +196,7 @@ public class step6_file {
                         } else if (list.get(0) instanceof MalFunctionWrapper) {
                             MalFunctionWrapper wrapper = (MalFunctionWrapper) list.get(0);
                             ast = wrapper.getAst();
-                            ReplEnv newEnv = new ReplEnv(wrapper.getEnv(), wrapper.getParams(), 
+                            Env newEnv = new Env(wrapper.getEnv(), wrapper.getParams(), 
                                 list.subList(1, list.size()).toArray(new MalType[0])
                             );
                             env = newEnv;

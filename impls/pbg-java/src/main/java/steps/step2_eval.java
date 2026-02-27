@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import main.java.Printer;
 import main.java.Reader;
-import main.java.ReplEnv;
+import main.java.Env;
 import main.java.malTypes.MalFunction;
 import main.java.malTypes.MalHashMap;
 import main.java.malTypes.MalHashMapKey;
@@ -19,7 +19,7 @@ public class step2_eval {
     public static void main(String args[]) {
         Scanner s = new Scanner(System.in);
         step2_eval repl = new step2_eval();
-        ReplEnv env = new ReplEnv();
+        Env env = new Env();
         env.set(new MalSymbol("+"), new MalFunction() {
             @Override
             public MalInteger operate(MalType[] a) {
@@ -84,14 +84,14 @@ public class step2_eval {
     }
 
     
-    public String repl(String s, ReplEnv repl_env) throws Exception {
+    public String repl(String s, Env repl_env) throws Exception {
         return print(eval(read(s), repl_env));
     }
     
     public MalType read(String s) throws Exception {
         return Reader.readStr(s);
     }
-    public MalType eval(MalType ast, ReplEnv repl_env) throws Exception {
+    public MalType eval(MalType ast, Env repl_env) throws Exception {
         if (ast instanceof MalSymbol) {
             MalSymbol symbol = (MalSymbol) ast;
             MalType val = repl_env.get(symbol);

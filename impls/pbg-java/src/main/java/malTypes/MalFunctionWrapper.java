@@ -1,13 +1,13 @@
 package main.java.malTypes;
 
-import main.java.ReplEnv;
+import main.java.Env;
 
 public class MalFunctionWrapper extends MalType {
     private MalFunction fn;
     private MalType ast;
     private MalCollectionListType params;
-    private ReplEnv env;
-    public MalFunctionWrapper(MalType ast, MalCollectionListType params, ReplEnv env, MalFunction fn) {
+    private Env env;
+    public MalFunctionWrapper(MalType ast, MalCollectionListType params, Env env, MalFunction fn) {
         this.fn = fn;
         this.env = env;
         this.ast = ast;
@@ -16,7 +16,7 @@ public class MalFunctionWrapper extends MalType {
     public MalType getAst() {
         return ast;
     }
-    public ReplEnv getEnv() {
+    public Env getEnv() {
         return env;
     }
     public MalFunction getFn() {

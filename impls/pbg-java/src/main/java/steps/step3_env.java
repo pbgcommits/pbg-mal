@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import main.java.Printer;
 import main.java.Reader;
-import main.java.ReplEnv;
+import main.java.Env;
 import main.java.malTypes.MalCollectionListType;
 import main.java.malTypes.MalFunction;
 import main.java.malTypes.MalHashMap;
@@ -21,7 +21,7 @@ public class step3_env {
     public static void main(String args[]) {
         Scanner s = new Scanner(System.in);
         step3_env repl = new step3_env();
-        ReplEnv env = new ReplEnv();
+        Env env = new Env();
         env.set(new MalSymbol("+"), new MalFunction() {
             @Override
             public MalInteger operate(MalType[] a) {
@@ -86,19 +86,19 @@ public class step3_env {
     }
 
     
-    public String repl(String s, ReplEnv env) throws Exception {
+    public String repl(String s, Env env) throws Exception {
         return print(eval(read(s), env));
     }
     
     public MalType read(String s) throws Exception {
         return Reader.readStr(s);
     }
-    public MalType eval(MalType ast, ReplEnv env) throws Exception {
+    public MalType eval(MalType ast, Env env) throws Exception {
         if (ast instanceof MalSymbol) {
             MalSymbol symbol = (MalSymbol) ast;
             MalType val = env.get(symbol);
             if (val == null) {
-                throw new Exception(symbol.toString() + " " + ReplEnv.LOOKUP_ERROR);
+                throw new Exception(symbol.toString() + " " + Env.LOOKUP_ERROR);
             }
             return val;
         } else if (ast instanceof MalList) {
@@ -121,12 +121,12 @@ public class step3_env {
             return ast;
         }
     }
-    private MalType apply(MalType ast, ReplEnv env) throws Exception {
+    private MalType apply(MalType ast, Env env) throws Exception {
         List<MalType> originalList = ((MalList) ast).getCollection();
         if (originalList.size() == 0) {
             return ast;
         }
-        if (originalList.get(0).toString().equals(ReplEnv.DEF_ENV_VAR_KW)) {
+        if (originalList.get(0).toString().equals(Env.DEF_ENV_VAR_KW)) {
             if (originalList.size() != 3) {
                 throw new Exception(LIST_ERROR);
             }
@@ -137,14 +137,14 @@ public class step3_env {
             env.set((MalSymbol) originalList.get(1), value);
             return value;
         }
-        else if (originalList.get(0).toString().equals(ReplEnv.LET_NEW_ENV_KW)) {
+        else if (originalList.get(0).toString().equals(Env.LET_NEW_ENV_KW)) {
             if (originalList.size() != 3) {
                 throw new Exception(LIST_ERROR);
             }
             if (!(originalList.get(1) instanceof MalCollectionListType)) {
                 throw new Exception(LIST_ERROR);
             }
-            ReplEnv newEnv = new ReplEnv(env);
+            Env newEnv = new Env(env);
             List<MalType> innerList = ((MalCollectionListType) originalList.get(1)).getCollection();
             if (innerList.size() % 2 != 0) {
                 throw new Exception(LIST_ERROR);
