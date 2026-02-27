@@ -410,7 +410,13 @@ public class Core {
                 return newList;
             }
         });
-
+        this.ns.put(new MalSymbol("throw"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                throw new Exception(a[0].toString(false));
+            }
+        });
 
 
         this.ns.put(new MalSymbol("macro?"), new MalFunction() {
