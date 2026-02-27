@@ -51,6 +51,9 @@ public class step8_macros {
             repl.repl(
                 "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\\nnil)\")))))", 
                 env);
+            repl.repl(
+                "(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to cond\")) (cons 'cond (rest (rest xs)))))))", 
+                env);
             MalList argv = new MalList();
             for (int i = 1; i < args.length; i++) {
                 argv.add(new MalString(args[i], false));

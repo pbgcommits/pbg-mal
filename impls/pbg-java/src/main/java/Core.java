@@ -15,6 +15,7 @@ import main.java.malTypes.MalFunction;
 import main.java.malTypes.MalFunctionWrapper;
 import main.java.malTypes.MalInteger;
 import main.java.malTypes.MalList;
+import main.java.malTypes.MalMacroFunction;
 import main.java.malTypes.MalNil;
 import main.java.malTypes.MalString;
 import main.java.malTypes.MalSymbol;
@@ -354,6 +355,69 @@ public class Core {
                 } else {
                     throw new Exception(LIST_ERROR);
                 }
+            }
+        });
+        this.ns.put(new MalSymbol("nth"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 2);
+                if (!(a[0] instanceof MalCollectionListType)) {
+                    throw new Exception("Expected list/vector; got " + a[0].getClass());
+                }
+                if (!(a[1] instanceof MalInteger)) {
+                    throw new Exception("Expected integer; got " + a[1].getClass());
+                }
+                MalCollectionListType list = (MalCollectionListType) a[0];
+                int num = ((MalInteger) a[1]).getNumber();
+                if (list.size() < num + 1) {
+                    throw new Exception("Index " + num + " out of range");
+                }
+                return list.get(num);
+            }
+        });
+        this.ns.put(new MalSymbol("first"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (a[0] instanceof MalNil) {
+                    return new MalNil();
+                }
+                if (!(a[0] instanceof MalCollectionListType)) {
+                    throw new Exception("Expected list/vector; got " + a[0].getClass());
+                }
+                MalCollectionListType list = (MalCollectionListType) a[0];
+                if (list.size() < 1) {
+                    return new MalNil();
+                }
+                return list.get(0);
+            }
+        });
+        this.ns.put(new MalSymbol("rest"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (a[0] instanceof MalNil) {
+                    return new MalList();
+                }
+                if (!(a[0] instanceof MalCollectionListType)) {
+                    throw new Exception("Expected list/vector; got " + a[0].getClass());
+                }
+                MalCollectionListType list = (MalCollectionListType) a[0];
+                MalList newList = new MalList();
+                for (int i = 1; i < list.size(); i++) {
+                    newList.add(list.get(i));
+                }
+                return newList;
+            }
+        });
+
+
+
+        this.ns.put(new MalSymbol("macro?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalMacroFunction);
             }
         });
     }
