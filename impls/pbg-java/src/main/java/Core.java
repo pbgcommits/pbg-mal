@@ -417,7 +417,65 @@ public class Core {
                 throw new Exception(a[0].toString(false));
             }
         });
+        this.ns.put(new MalSymbol("apply"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 2);
+                MalFunction function;
+                if (a[0] instanceof MalFunction) {
+                    function = (MalFunction) a[0];
+                } else if (a[0] instanceof MalFunctionWrapper) {
+                    function = ((MalFunctionWrapper) a[0]).getFn();
+                } else if (a[0] instanceof MalMacroFunction) {
+                    function = ((MalMacroFunction) a[0]).getFunction();
+                } else {
+                    throw new Exception("Expected arg 1 to be function, got " + a[0].getClass());
+                }
+                if (!(a[a.length-1] instanceof MalCollectionListType)) {
+                    throw new Exception("Expected arg 2 to be list/vector, got " + a[a.length - 1].getClass());
+                }
+                MalCollectionListType last = (MalCollectionListType) a[a.length - 1];
+                MalList list = new MalList();
+                for (int i = 1; i < a.length - 1; i++) {
+                    list.add(a[i]);
+                }
+                for (MalType t : last.getCollection()) {
+                    list.add(t);
+                }
+                return function.operate(list.getCollection().toArray(new MalType[0]));
+            }
+        });
+        this.ns.put(new MalSymbol("map"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 2);
+                MalFunction function;
+                if (a[0] instanceof MalFunction) {
+                    function = (MalFunction) a[0];
+                } else if (a[0] instanceof MalFunctionWrapper) {
+                    function = ((MalFunctionWrapper) a[0]).getFn();
+                } else if (a[0] instanceof MalMacroFunction) {
+                    function = ((MalMacroFunction) a[0]).getFunction();
+                } else {
+                    throw new Exception("Expected arg 1 to be function, got " + a[0].getClass());
+                }
+                if (!(a[1] instanceof MalCollectionListType)) {
+                    throw new Exception("Expected arg 2 to be list/vector, got " + a[a.length - 1].getClass());
+                }
+                MalList list = new MalList();
+                ((MalCollectionListType) a[1]).getCollection().forEach((t) -> { 
+                    try {
+                        MalType[] x = {t};
+                        list.add(function.operate(x)); 
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                });;
+                return list;
+            }
+        });
 
+        
 
         this.ns.put(new MalSymbol("macro?"), new MalFunction() {
             @Override
