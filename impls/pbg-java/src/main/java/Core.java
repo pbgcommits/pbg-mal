@@ -13,7 +13,10 @@ import main.java.malTypes.MalCollectionListType;
 import main.java.malTypes.MalFalse;
 import main.java.malTypes.MalFunction;
 import main.java.malTypes.MalFunctionWrapper;
+import main.java.malTypes.MalHashMap;
+import main.java.malTypes.MalHashMapKey;
 import main.java.malTypes.MalInteger;
+import main.java.malTypes.MalKeyword;
 import main.java.malTypes.MalList;
 import main.java.malTypes.MalMacroFunction;
 import main.java.malTypes.MalNil;
@@ -474,7 +477,212 @@ public class Core {
                 return list;
             }
         });
-
+        this.ns.put(new MalSymbol("nil?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalNil);
+            }
+        });
+        this.ns.put(new MalSymbol("true?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalTrue);
+            }
+        });
+        this.ns.put(new MalSymbol("false?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalFalse);
+            }
+        });
+        this.ns.put(new MalSymbol("symbol?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalSymbol);
+            }
+        });
+        this.ns.put(new MalSymbol("symbol"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (!(a[0] instanceof MalString)) {
+                    throw new Exception("Expected string, got " + a[0].getClass());
+                }
+                return new MalSymbol(((MalString) a[0]).toString(false));
+            }
+        });
+        this.ns.put(new MalSymbol("keyword"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (a[0] instanceof MalKeyword) {
+                    return a[0];
+                }
+                if (!(a[0] instanceof MalString)) {
+                    throw new Exception("Expected string, got " + a[0].getClass());
+                }
+                return new MalKeyword(MalKeyword.KEYWORD_START + ((MalString) a[0]).toString(false));
+            }
+        });
+        this.ns.put(new MalSymbol("keyword?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalKeyword);
+            }
+        });
+        this.ns.put(new MalSymbol("vector"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                MalVector v = new MalVector();
+                for (MalType t : a) {
+                    v.add(t);
+                }
+                return v;
+            }
+        });
+        this.ns.put(new MalSymbol("vector?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalVector);
+            }
+        });
+        this.ns.put(new MalSymbol("sequential?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalCollectionListType);
+            }
+        });
+        this.ns.put(new MalSymbol("hash-map"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                if (a.length % 2 != 0) {
+                    throw new Exception("Expected even num of args");
+                }
+                MalHashMap map = new MalHashMap();
+                for (MalType t : a) {
+                    map.add(t);
+                }
+                return map;
+            }
+        });
+        this.ns.put(new MalSymbol("map?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalHashMap);
+            }
+        });
+        this.ns.put(new MalSymbol("assoc"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (!(a[0] instanceof MalHashMap)) {
+                    throw new Exception("Expected hashmap; got " + a[0].getClass());
+                }
+                MalHashMap original = (MalHashMap) a[0];
+                MalHashMap map = new MalHashMap();
+                for (MalHashMapKey key : original.getCollection().keySet()) {
+                    map.put(key, original.getCollection().get(key));
+                }
+                for (int i = 1; i < a.length; i++) {
+                    map.add(a[i]);
+                }
+                if (a.length % 2 != 1) {
+                    map.add(new MalNil());
+                }
+                return map;
+            }
+        });
+        this.ns.put(new MalSymbol("dissoc"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (!(a[0] instanceof MalHashMap)) {
+                    return a[0];
+                }
+                MalHashMap map = new MalHashMap();
+                MalHashMap original = (MalHashMap) a[0];
+                for (MalHashMapKey key : original.getCollection().keySet()) {
+                    map.put(key, original.getCollection().get(key));
+                }
+                for (int i = 1; i < a.length; i++) {
+                    if (!(a[i] instanceof MalHashMapKey)) {
+                        throw new Exception("Expected " + a[i] + " to be HashMapKey");
+                    }
+                    map.getCollection().remove(a[i]);
+                }
+                return map;
+            }
+        });
+        this.ns.put(new MalSymbol("get"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (a[0] instanceof MalNil) {
+                    return new MalNil();
+                }
+                if (!(a[0] instanceof MalHashMap)) {
+                    throw new Exception("Expected hashmap, got " + a[0].getClass());
+                }
+                if (a.length < 2 || !(a[1] instanceof MalHashMapKey)) {
+                    return new MalNil();
+                }
+                MalType value = ((MalHashMap) a[0]).getCollection().get(a[1]);
+                if (value == null) {
+                    return new MalNil();
+                } else {
+                    return value;
+                }
+            }
+        });
+        this.ns.put(new MalSymbol("contains?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (!(a[0] instanceof MalHashMap)) {
+                    throw new Exception("Expected hashmap, got " + a[0].getClass());
+                }
+                if (a.length < 2 || !(a[1] instanceof MalHashMapKey)) {
+                    return new MalFalse();
+                }
+                return MalBoolean.getBoolean(((MalHashMap) a[0]).getCollection().containsKey(a[1]));
+            }
+        });
+        this.ns.put(new MalSymbol("keys"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (!(a[0] instanceof MalHashMap)) {
+                    throw new Exception("Expected hashmap, got " + a[0].getClass());
+                }
+                MalList list = new MalList();
+                for (MalHashMapKey key : ((MalHashMap) a[0]).getCollection().keySet()) {
+                    list.add(key);
+                }
+                return list;
+            }
+        });
+        this.ns.put(new MalSymbol("vals"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (!(a[0] instanceof MalHashMap)) {
+                    throw new Exception("Expected hashmap, got " + a[0].getClass());
+                }
+                MalList list = new MalList();
+                for (MalType value : ((MalHashMap) a[0]).getCollection().values()) {
+                    list.add(value);
+                }
+                return list;
+            }
+        });
         
 
         this.ns.put(new MalSymbol("macro?"), new MalFunction() {

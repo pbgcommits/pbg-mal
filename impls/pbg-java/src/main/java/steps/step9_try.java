@@ -221,10 +221,13 @@ public class step9_try {
                         break;
                     }
                     case TRY_KW: {
-                        verifyLengthAtLeast(originalList, 3);
+                        verifyLengthAtLeast(originalList, 2);
                         try {
                             return this.eval(originalList.get(1), env);
                         } catch (Exception e) {
+                            if (originalList.size() < 3) {
+                                throw e;
+                            }
                             if (!(originalList.get(2) instanceof MalList)) {
                                 throw new Exception("Expected catch* block");
                             }

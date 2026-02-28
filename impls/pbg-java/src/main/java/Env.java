@@ -47,4 +47,17 @@ public class Env {
         }
         return this.data.get(key);
     }
+    @Override
+    public String toString() {
+        HashMap<MalSymbol, MalType> map = new HashMap<>();
+        Env iterEnv = this;
+        while (iterEnv != null) {
+            HashMap<MalSymbol, MalType> iter = iterEnv.getMap();
+            for (MalSymbol key : iter.keySet()) {
+                map.put(key, iter.get(key));
+            }
+            iterEnv = iterEnv.outer;
+        }
+        return map.toString();
+    }
 }
