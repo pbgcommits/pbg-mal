@@ -81,10 +81,6 @@ public class step9_try {
             catch (java.util.NoSuchElementException e) {
                 break;
             }
-            catch (IndexOutOfBoundsException e) {
-                System.out.println("unbalanced parens");
-                // e.printStackTrace();
-            } 
             catch (Exception e) {
                 System.out.println("Exception raised: " + e.getMessage());
                 // e.printStackTrace();

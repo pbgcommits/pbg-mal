@@ -47,10 +47,14 @@ public class Reader {
         return tokens.get(position);
     }
     public static MalType readStr(String s) throws Exception {
-        List<String> tokens = Reader.tokenise(s);
-        Reader r = new Reader(tokens);
-        MalType m = r.readForm();
-        return m;
+        try {
+            List<String> tokens = Reader.tokenise(s);
+            Reader r = new Reader(tokens);
+            MalType m = r.readForm();
+            return m;
+        } catch (IndexOutOfBoundsException e) {
+            throw new Exception("unbalanced parens");
+        }
     }
     public static List<String> tokenise(String s) {
         Matcher matcher = tokenPattern.matcher(s);

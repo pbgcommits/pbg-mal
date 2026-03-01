@@ -16,4 +16,14 @@ public abstract class MalType {
     public int hashCode() {
         return this.toString().hashCode();
     }
+    private MalType metadata = null;
+    public MalType getMetadata() {
+        if (metadata == null) {
+            return new MalNil();
+        }
+        return this.metadata;
+    }
+    public void setMetadata(MalType metadata) {
+        this.metadata = metadata;
+    }
 }

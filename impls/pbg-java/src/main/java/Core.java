@@ -7,8 +7,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 import main.java.malTypes.MalAtom;
 import main.java.malTypes.MalBoolean;
@@ -686,33 +684,22 @@ public class Core {
                 return list;
             }
         });
-        this.ns.put(new MalSymbol("readline"), new MalFunction() {
-            @Override
-            public MalType operate(MalType[] a) throws Exception {
-                if (a.length > 0) {
-                    System.out.println(a[0]);
-                }
-                Scanner scanner = new Scanner(System.in);
-                try {
-                    String input = scanner.nextLine();
-                    scanner.close();
-                    return new MalString(input, false);
-                } catch (NoSuchElementException e) {
-                    scanner.close();
-                    return new MalNil();
-                }
-            }
-        });
         this.ns.put(new MalSymbol("meta"), new MalFunction() {
             @Override
             public MalType operate(MalType[] a) throws Exception {
-                throw new Exception("meta not implemented");
+                verifyLengthAtLeast(a, 1);
+                return a[0].getMetadata();
             }
         });
         this.ns.put(new MalSymbol("with-meta"), new MalFunction() {
             @Override
             public MalType operate(MalType[] a) throws Exception {
-                throw new Exception("with-meta not implemented");
+                verifyLengthAtLeast(a, 1);
+                if (a.length < 2) {
+                    return a[0];
+                }
+                a[0].setMetadata(a[1]);
+                return a[0];
             }
         });
         this.ns.put(new MalSymbol("time-ms"), new MalFunction() {

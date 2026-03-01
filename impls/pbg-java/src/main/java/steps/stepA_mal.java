@@ -53,7 +53,7 @@ public class stepA_mal {
             @Override
             public MalType operate(MalType[] a) throws Exception {
                 if (a.length > 0) {
-                    System.out.println(a[0]);
+                    System.out.print(a[0].toString(false));
                 }
                 try {
                     String input = s.nextLine();
@@ -267,18 +267,22 @@ public class stepA_mal {
                     }
                     default: {
                         // ---apply---
-                        List<MalType> evaluatedArgs = new ArrayList<>();
                         MalType first = this.eval(originalList.get(0), env);
-                        for (int i = 1; i < originalList.size(); i++) {
-                            evaluatedArgs.add(this.eval(originalList.get(i), env));
-                        }
                         if (first instanceof MalMacroFunction) {
                             List<MalType> unevaluatedArgs = originalList.subList(1, originalList.size());
                             ast = ((MalMacroFunction) first).getFunction()
                                                             .operate(unevaluatedArgs.toArray(new MalType[0]));
                         } else if (first instanceof MalFunction) {
+                            List<MalType> evaluatedArgs = new ArrayList<>();
+                            for (int i = 1; i < originalList.size(); i++) {
+                                evaluatedArgs.add(this.eval(originalList.get(i), env));
+                            }
                             return ((MalFunction)first).operate(evaluatedArgs.toArray(new MalType[0]));
                         } else if (first instanceof MalFunctionWrapper) {
+                            List<MalType> evaluatedArgs = new ArrayList<>();
+                            for (int i = 1; i < originalList.size(); i++) {
+                                evaluatedArgs.add(this.eval(originalList.get(i), env));
+                            }
                             MalFunctionWrapper wrapper = (MalFunctionWrapper) first;
                             ast = wrapper.getAst();
                             env = new Env(wrapper.getEnv(), wrapper.getParams(), evaluatedArgs.toArray(new MalType[0]));
