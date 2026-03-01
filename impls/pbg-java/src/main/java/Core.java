@@ -235,6 +235,9 @@ public class Core {
             @Override
             public MalType operate(MalType[] a) throws Exception {
                 verifyLengthAtLeast(a, 1);
+                if (!(a[0] instanceof MalString)) {
+                    throw new Exception("Expected string, got " + a[0].getClass());
+                }
                 String read = a[0].toString(false);
                 // Remove surrounding quotes
                 MalType x = Reader.readStr(read);
@@ -248,7 +251,7 @@ public class Core {
                 Path p = Path.of(a[0].toString(false));
                 try {
                     String s = Files.readString(p, StandardCharsets.UTF_8);
-                    return new MalString(s, false);
+                    return new MalString(s, false, true);
                 } catch (IOException e) {
                     throw new Exception("IOException: " + e.getMessage());
                 }

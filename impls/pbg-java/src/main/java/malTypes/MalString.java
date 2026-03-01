@@ -13,12 +13,16 @@ public class MalString extends MalHashMapKey {
     public MalString(String s) throws Exception {
         this(s, true);
     }
+    public MalString(String s, boolean quoted) throws Exception {
+        this(s, quoted, false);
+     }
     /**
      * @param s 
      * @param quoted Should be set to true if the string is known to be surrounded by quotation marks.
+     * @param hyperEscape Set to true if the string is being read in literally (usually, from a .mal file).
      * @throws Exception
      */
-    public MalString(String s, boolean quoted) throws Exception {
+    public MalString(String s, boolean quoted, boolean hyperEscape) throws Exception {
         int sLength = s.length();
         StringBuilder builder = new StringBuilder();
         char[] sc = s.toCharArray();
@@ -26,7 +30,13 @@ public class MalString extends MalHashMapKey {
         int start = quoted ? 1 : 0;
         int end = quoted ? sLength - 1 : sLength;
         for (int i = start; i < end; i++) {
-            if (sc[i] == '\\') {
+            if (hyperEscape) {
+                switch (sc[i]) {
+                    case '\"' -> builder.append("\\\"");
+                    case '\\' -> builder.append("\\\\");
+                    default -> builder.append(sc[i]);
+                }
+            } else if (sc[i] == '\\') {
                 if (i + 1 == sLength - 1) {
                     throw new Exception(ESCAPE_CHAR_MESSAGE);
                 }
