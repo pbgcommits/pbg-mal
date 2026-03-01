@@ -3,9 +3,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 import main.java.malTypes.MalAtom;
 import main.java.malTypes.MalBoolean;
@@ -46,7 +49,7 @@ public class Core {
         this.ns.put(new MalSymbol("-"), new MalFunction() {
             @Override
             public MalInteger operate(MalType[] a) {
-                int diff = 2 * ((MalInteger) a[0]).getNumber();
+                long diff = 2 * ((MalInteger) a[0]).getNumber();
                 for (MalType i : a) {
                     diff -= ((MalInteger) i).getNumber();
                 }
@@ -66,7 +69,7 @@ public class Core {
         this.ns.put(new MalSymbol("/"), new MalFunction() {
             @Override
             public MalInteger operate(MalType[] a) {
-                int quotient = ((MalInteger) a[0]).getNumber() * ((MalInteger) a[0]).getNumber();
+                long quotient = ((MalInteger) a[0]).getNumber() * ((MalInteger) a[0]).getNumber();
                 for (MalType i : a) {
                     quotient /= ((MalInteger) i).getNumber();
                 }
@@ -371,7 +374,7 @@ public class Core {
                     throw new Exception("Expected integer; got " + a[1].getClass());
                 }
                 MalCollectionListType list = (MalCollectionListType) a[0];
-                int num = ((MalInteger) a[1]).getNumber();
+                int num = (int) ((MalInteger) a[1]).getNumber();
                 if (list.size() < num + 1) {
                     throw new Exception("Index " + num + " out of range");
                 }
@@ -683,13 +686,128 @@ public class Core {
                 return list;
             }
         });
-        
-
+        this.ns.put(new MalSymbol("readline"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                if (a.length > 0) {
+                    System.out.println(a[0]);
+                }
+                Scanner scanner = new Scanner(System.in);
+                try {
+                    String input = scanner.nextLine();
+                    scanner.close();
+                    return new MalString(input, false);
+                } catch (NoSuchElementException e) {
+                    scanner.close();
+                    return new MalNil();
+                }
+            }
+        });
+        this.ns.put(new MalSymbol("meta"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                throw new Exception("meta not implemented");
+            }
+        });
+        this.ns.put(new MalSymbol("with-meta"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                throw new Exception("with-meta not implemented");
+            }
+        });
+        this.ns.put(new MalSymbol("time-ms"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                return new MalInteger(Instant.now().toEpochMilli());
+            }
+        });
+        this.ns.put(new MalSymbol("conj"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (a[0] instanceof MalList) {
+                    MalList list = new MalList();
+                    for (int i = a.length - 1; i >= 1; i--) {
+                        list.add(a[i]);
+                    }
+                    MalList og = (MalList) a[0];
+                    for (MalType item : og.getCollection()) {
+                        list.add(item);
+                    }
+                    return list;
+                } else if (a[0] instanceof MalVector) {
+                    MalVector og = (MalVector) a[0];
+                    MalVector v = new MalVector();
+                    for (MalType item : og.getCollection()) {
+                        v.add(item);
+                    }
+                    for (int i = 1; i < a.length; i++) {
+                        v.add(a[i]);
+                    }
+                    return v;
+                } else {
+                    throw new Exception("Excepted list/vector, got " + a[0].getClass());
+                }
+            }
+        });
+        this.ns.put(new MalSymbol("string?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalString);
+            }
+        });
+        this.ns.put(new MalSymbol("number?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalInteger);
+            }
+        });
+        this.ns.put(new MalSymbol("fn?"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                return MalBoolean.getBoolean(a[0] instanceof MalFunction || a[0] instanceof MalFunctionWrapper);
+            }
+        });
         this.ns.put(new MalSymbol("macro?"), new MalFunction() {
             @Override
             public MalType operate(MalType[] a) throws Exception {
                 verifyLengthAtLeast(a, 1);
                 return MalBoolean.getBoolean(a[0] instanceof MalMacroFunction);
+            }
+        });
+        this.ns.put(new MalSymbol("seq"), new MalFunction() {
+            @Override
+            public MalType operate(MalType[] a) throws Exception {
+                verifyLengthAtLeast(a, 1);
+                if (a[0] instanceof MalNil) {
+                    return new MalNil();
+                } else if (a[0] instanceof MalList) {
+                    MalList og = (MalList) a[0];
+                    MalList list = new MalList();
+                    for (MalType item : og.getCollection()) {
+                        list.add(item);
+                    }
+                    return list;
+                } else if (a[0] instanceof MalVector) {
+                    MalVector og = (MalVector) a[0];
+                    MalList list = new MalList();
+                    for (MalType item : og.getCollection()) {
+                        list.add(item);
+                    }
+                    return list;
+                } else if (a[0] instanceof MalString) {
+                    char[] chars = ((MalString) a[0]).toString(false).toCharArray();
+                    MalList charList = new MalList();
+                    for (char c : chars) {
+                        charList.add(new MalString(String.valueOf(c)));
+                    }
+                    return charList;
+                } else {
+                    throw new Exception("Expected list, vector, string, or nil");
+                }
             }
         });
     }

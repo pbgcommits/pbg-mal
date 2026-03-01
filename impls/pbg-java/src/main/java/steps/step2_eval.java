@@ -33,7 +33,7 @@ public class step2_eval {
         env.set(new MalSymbol("-"), new MalFunction() {
             @Override
             public MalInteger operate(MalType[] a) {
-                int diff = 2 * ((MalInteger) a[0]).getNumber();
+                long diff = 2 * ((MalInteger) a[0]).getNumber();
                 for (MalType i : a) {
                     diff -= ((MalInteger) i).getNumber();
                 }
@@ -53,7 +53,7 @@ public class step2_eval {
         env.set(new MalSymbol("/"), new MalFunction() {
             @Override
             public MalInteger operate(MalType[] a) {
-                int quotient = ((MalInteger) a[0]).getNumber() * ((MalInteger) a[0]).getNumber();
+                long quotient = ((MalInteger) a[0]).getNumber() * ((MalInteger) a[0]).getNumber();
                 for (MalType i : a) {
                     quotient /= ((MalInteger) i).getNumber();
                 }

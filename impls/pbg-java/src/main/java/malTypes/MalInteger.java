@@ -1,11 +1,14 @@
 package main.java.malTypes;
 
 public class MalInteger extends MalType {
-    private final int number;
+    private final long number;
+    public MalInteger(long num) {
+        this.number = num;
+    }
     public MalInteger(int num) {
         this.number = num;
     }
-    public int getNumber() {
+    public long getNumber() {
         return this.number;
     }
     @Override
