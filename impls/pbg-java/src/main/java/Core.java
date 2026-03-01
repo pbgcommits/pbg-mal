@@ -776,6 +776,9 @@ public class Core {
                     return new MalNil();
                 } else if (a[0] instanceof MalList) {
                     MalList og = (MalList) a[0];
+                    if (og.getCollection().isEmpty()) {
+                        return new MalNil();
+                    }
                     MalList list = new MalList();
                     for (MalType item : og.getCollection()) {
                         list.add(item);
@@ -783,6 +786,9 @@ public class Core {
                     return list;
                 } else if (a[0] instanceof MalVector) {
                     MalVector og = (MalVector) a[0];
+                    if (og.getCollection().isEmpty()) {
+                        return new MalNil();
+                    }
                     MalList list = new MalList();
                     for (MalType item : og.getCollection()) {
                         list.add(item);
@@ -790,9 +796,12 @@ public class Core {
                     return list;
                 } else if (a[0] instanceof MalString) {
                     char[] chars = ((MalString) a[0]).toString(false).toCharArray();
+                    if (chars.length == 0) {
+                        return new MalNil();
+                    }
                     MalList charList = new MalList();
                     for (char c : chars) {
-                        charList.add(new MalString(String.valueOf(c)));
+                        charList.add(new MalString(String.valueOf(c), false));
                     }
                     return charList;
                 } else {
