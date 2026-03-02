@@ -56,7 +56,7 @@ public class step8_macros {
                 env);
             MalList argv = new MalList();
             for (int i = 1; i < args.length; i++) {
-                argv.add(new MalString(args[i], false));
+                argv.add(new MalString(args[i]));
             }
             env.set(new MalSymbol("*ARGV*"), argv);
             if (args.length > 0) {

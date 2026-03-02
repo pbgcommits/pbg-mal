@@ -57,7 +57,7 @@ public class stepA_mal {
                 }
                 try {
                     String input = s.nextLine();
-                    return new MalString(input, false);
+                    return new MalString(input);
                 } catch (NoSuchElementException e) {
                     return new MalNil();
                 } catch (Exception e) {
@@ -67,7 +67,7 @@ public class stepA_mal {
             }
         });
         try {
-            env.set(new MalSymbol("*host-language*"), new MalString("pbg-java", false));
+            env.set(new MalSymbol("*host-language*"), new MalString("pbg-java"));
             repl.repl("(def! not (fn* (a) (if a false true)))", env);
             repl.repl(
                 "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\\nnil)\")))))", 
@@ -77,7 +77,7 @@ public class stepA_mal {
                 env);
             MalList argv = new MalList();
             for (int i = 1; i < args.length; i++) {
-                argv.add(new MalString(args[i], false));
+                argv.add(new MalString(args[i]));
             }
             env.set(new MalSymbol("*ARGV*"), argv);
             if (args.length > 0) {
@@ -263,7 +263,7 @@ public class stepA_mal {
                             }
                             Env newEnv = new Env(env);
                             newEnv.set(new MalSymbol(
-                                catchBlock.get(1).toString()), new MalString(e.getMessage(), false)
+                                catchBlock.get(1).toString()), new MalString(e.getMessage())
                             );
                             return this.eval(catchBlock.get(2), newEnv);
                         }

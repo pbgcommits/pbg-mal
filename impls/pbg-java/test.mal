@@ -1,2 +1,1 @@
-(def! hello "Hello world!")
-(def! goodbye "Goodbye world!");Fun times
+(prn "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\nnil)\")))))")

@@ -58,7 +58,7 @@ public class step9_try {
                 env);
             MalList argv = new MalList();
             for (int i = 1; i < args.length; i++) {
-                argv.add(new MalString(args[i], false));
+                argv.add(new MalString(args[i]));
             }
             env.set(new MalSymbol("*ARGV*"), argv);
             if (args.length > 0) {
@@ -238,7 +238,7 @@ public class step9_try {
                             }
                             Env newEnv = new Env(env);
                             newEnv.set(new MalSymbol(
-                                catchBlock.get(1).toString()), new MalString(e.getMessage(), false)
+                                catchBlock.get(1).toString()), new MalString(e.getMessage())
                             );
                             return this.eval(catchBlock.get(2), newEnv);
                         }

@@ -171,7 +171,7 @@ public class Core {
                     b.append(" ");
                 }
                 b.append(Printer.pr_str(a[a.length-1], true));
-                return new MalString(MalString.getReadable(b.toString()));
+                return new MalString(b.toString());
             }
         });
         this.ns.put(new MalSymbol("str"), new MalFunction() {
@@ -181,18 +181,13 @@ public class Core {
                     return new MalString("");
                 }
                 if (a.length == 1) {
-                    if (a[0] instanceof MalString) {
-                        return new MalString(a[0].toString());
-                    }
-                    return new MalString(a[0].toString(), false);
+                    return new MalString(a[0].toString(false));
                 }
                 StringBuilder b = new StringBuilder();
-                b.append("\"");
                 for (int i = 0; i < a.length - 1; i++) {
                     b.append(Printer.pr_str(a[i], false));
                 }
                 b.append(Printer.pr_str(a[a.length-1], false));
-                b.append("\"");
                 MalString s = new MalString(b.toString());
                 return s;
             }
@@ -251,7 +246,7 @@ public class Core {
                 Path p = Path.of(a[0].toString(false));
                 try {
                     String s = Files.readString(p, StandardCharsets.UTF_8);
-                    return new MalString(s, false);
+                    return new MalString(s);
                 } catch (IOException e) {
                     throw new Exception("IOException: " + e.getMessage());
                 }
@@ -801,7 +796,7 @@ public class Core {
                     }
                     MalList charList = new MalList();
                     for (char c : chars) {
-                        charList.add(new MalString(String.valueOf(c), false));
+                        charList.add(new MalString(String.valueOf(c)));
                     }
                     return charList;
                 } else {

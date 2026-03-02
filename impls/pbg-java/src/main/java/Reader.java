@@ -137,7 +137,27 @@ public class Reader {
             if (s.length() == 1 || !s.endsWith(MalString.STRING_END)) {
                 throw new Exception("unbalanced quotation marks");
             }
-            return new MalString(s);
+            int sLength = s.length();
+            StringBuilder builder = new StringBuilder();
+            char[] sc = s.toCharArray();
+            // [1, sLength-1] to remove enclosing double quotes
+            for (int i = 1; i < sLength - 1; i++) {
+                if (sc[i] == '\\') {
+                    if (i + 1 == sLength - 1) {
+                        throw new Exception("unbalanced string");
+                    }
+                    switch (sc[i+1]) {
+                        case 'n' -> builder.append('\n');
+                        case '\"' -> builder.append('\"');
+                        case '\\' -> builder.append('\\');
+                        default -> throw new Exception("unbalanced string");
+                    }
+                    i++;
+                } else {
+                    builder.append(sc[i]);
+                }
+            }
+            return new MalString(builder.toString());
         }
         if (s.equals(MalNil.NIL)) {
             return new MalNil();

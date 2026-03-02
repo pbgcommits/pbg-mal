@@ -345,10 +345,8 @@
 (pr-str true "." false "." nil "." :keyw "." 'symb)
 ;=>"true \".\" false \".\" nil \".\" :keyw \".\" symb"
 
-;; -- THIS TEST MODIFIED BY ME (hopefully correctly) --
-;; original second line: (cond (= s "{:abc val1 :def val2}") true (= s "{:def val2 :abc val1}") true)
 (def! s (str {:abc "val1" :def "val2"}))
-(cond (= s "{:abc \"val1\" :def \"val2\"}") true (= s "{:def \"val2\" :abc \"val1\"}") true)
+(cond (= s "{:abc val1 :def val2}") true (= s "{:def val2 :abc val1}") true)
 ;=>true
 
 (def! p (pr-str {:abc "val1" :def "val2"}))
