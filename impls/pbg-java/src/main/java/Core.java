@@ -251,7 +251,7 @@ public class Core {
                 Path p = Path.of(a[0].toString(false));
                 try {
                     String s = Files.readString(p, StandardCharsets.UTF_8);
-                    return new MalString(s, false, true);
+                    return new MalString(s, false);
                 } catch (IOException e) {
                     throw new Exception("IOException: " + e.getMessage());
                 }

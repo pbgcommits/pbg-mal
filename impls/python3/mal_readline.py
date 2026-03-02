@@ -5,10 +5,12 @@ import atexit
 import os.path
 import readline
 
-histfile = os.path.join(os.path.expanduser('~'), '.mal-history')
+histfile = os.path.join(os.path.expanduser("~"), ".mal-history")
 try:
     readline.read_history_file(histfile)
 except FileNotFoundError:
+    pass
+except PermissionError:
     pass
 readline.set_history_length(1000)
 atexit.register(readline.write_history_file, histfile)

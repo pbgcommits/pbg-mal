@@ -60,6 +60,9 @@ public class stepA_mal {
                     return new MalString(input, false);
                 } catch (NoSuchElementException e) {
                     return new MalNil();
+                } catch (Exception e) {
+                    System.out.println("Exception occured: " + e.getMessage());
+                    return new MalString("");
                 }
             }
         });
