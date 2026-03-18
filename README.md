@@ -2,6 +2,7 @@ My implementation (written in Java) of Kanaka's MAL language (a Clojure-inspired
 It is powerful enough to can self-host (i.e., you can write a MAL interpreter in my implementation of MAL). 
 See my implementation in the [impls/pbg-java folder](https://github.com/pbgcommits/pbg-mal/tree/master/impls/pbg-java).
 
+Below is the original README for Mal.
 
 # mal - Make a Lisp
 
