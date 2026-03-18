@@ -1,3 +1,8 @@
+My implementation (written in Java) of Kanaka's MAL language (a Clojure-inspired Lisp).
+It is powerful enough to can self-host (i.e., you can write a MAL interpreter in my implementation of MAL). 
+See my implementation in the [impls/pbg-java folder](https://github.com/pbgcommits/pbg-mal/tree/master/impls/pbg-java).
+
+
 # mal - Make a Lisp
 
 [![Build and Test](https://github.com/kanaka/mal/actions/workflows/main.yml/badge.svg)](https://github.com/kanaka/mal/actions/workflows/main.yml)
